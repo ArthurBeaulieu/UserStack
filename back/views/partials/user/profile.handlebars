@@ -1,0 +1,17 @@
+<h2>Profile</h2>
+<div id="profile-page">
+  <p id="error-output"></p>
+  <p>{{username}}</p>
+  <p>{{email}}</p>
+  <p>{{code}}</p>
+  <p>{{depth}}</p>
+  <p>{{godfather}}</p>
+  <p>{{registration}}</p>
+  <ul class="roles">
+    {{#each roles}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+  <a href="/profile/edit">Edit profile</a>
+  <a href="/">Homepage</a>
+</div>

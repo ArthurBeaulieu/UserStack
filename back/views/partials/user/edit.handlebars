@@ -1,0 +1,23 @@
+<h2>Edit profile</h2>
+<div>
+  <p id="error-output"></p>
+</div>
+<form id="edit-profile-info-form">
+  <label for="username">Username</label>
+  <input id="username" type="text" name="username" value="{{username}}">
+  <label for="email">Email</label>
+  <input id="email" type="email" name="email" value="{{email}}">
+  <input id="edit-profile-info-submit" type="submit" value="Submit">
+</form>
+<form id="edit-profile-password-form">
+  <label for="pass1">Current password</label>
+  <input id="pass1" type="password" name="pass1">
+  <label for="pass2">New password</label>
+  <input id="pass2" type="password" name="pass2">
+  <label for="pass3">Confirm new password</label>
+  <input id="pass3" type="password" name="pass3">
+  <input id="edit-profile-password-submit" type="submit" value="Submit">
+</form>
+<button id="delete-account">Delete account</button>
+<a href="/profile">Profile</a>
+{{> 'loader/lineloader'}}
