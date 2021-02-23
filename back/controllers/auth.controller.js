@@ -62,6 +62,7 @@ const insertNewUser = opts => {
       });
       if (stopExec) { return; }
       opts.user.registration = new Date();
+      opts.user.lastlogin = new Date();
       // Create super user if no previous user in database
       opts.user.roles = [];
       for (let i = 0; i < roles.length; ++i) {
@@ -110,6 +111,8 @@ const finalizeLogin = opts => {
     return;
   }
 
+  opts.user.lastlogin = new Date();
+  opts.user.save(saveErr => {});
   const token = jwt.sign({ id: opts.user.id }, config.secret, {
     expiresIn: 86400
   });

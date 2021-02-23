@@ -9,6 +9,7 @@ const User = mongoose.model(
     code: String,
     password: String,
     registration: Date,
+    lastlogin: Date,
     parent: mongoose.Schema.Types.ObjectId,
     children: [],
     depth: Number,
