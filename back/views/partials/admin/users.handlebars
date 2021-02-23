@@ -1,0 +1,24 @@
+<h1>App roles</h1>
+<ul id="roles-list"></ul>
+<h1>Registered users</h1>
+<ul id="users-list">
+  {{#each users}}
+    <li data-id="{{this.id}}">
+      <p>Username : {{username}}</p>
+      <p>Email : <a href="mailto:{{this.email}}">{{this.email}}</a></p>
+      <p>Registration : {{this.registration}}</p>
+      <p>Godfather : {{this.godfather}}</p>
+      <p>Children : {{#each this.children}}
+        <span>{{this}}</span>
+      {{/each}}</p>
+      <p class="user-roles">Roles : {{#each this.roles}}
+        <span>
+          <label for="role{{this.id}}">{{this.name}}</label>
+          <input type="checkbox" id="role{{this.id}}" data-id="{{this.id}}" {{#if this.checked}}checked{{/if}}/>
+        </span>
+      {{/each}}</p>
+      <button class="delete-user">Delete</button>
+    </li>
+  {{/each}}
+</ul>
+<a href="/admin">Admin menu</a>

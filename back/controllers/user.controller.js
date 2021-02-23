@@ -1,16 +1,11 @@
 const config = require('../config/auth.config');
 const db = require('../models');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const Utils = require('../utils/server.utils');
 
 
 const User = db.user;
 const Role = db.role;
-
-
-const genInviteCode = () => {
-  return crypto.randomBytes(20).toString('hex').toUpperCase();
-};
 
 
 const connectChildrenToGodfather = (godfather, userId) => {
@@ -20,7 +15,7 @@ const connectChildrenToGodfather = (godfather, userId) => {
     user.parent = godfather._id;
     --user.depth;
     if (user.code === '') {
-      user.code = genInviteCode();
+      user.code = Utils.genInviteCode();
     }
     user.save(userUpdateErr => {});
     godfather.save(userUpdateErr => {});
@@ -35,13 +30,16 @@ exports.allAccess = (req, res) => {
   res.status(200).send('Public Content.');
 };
 
+
 exports.userBoard = (req, res) => {
   res.status(200).send('User Content.');
 };
 
+
 exports.adminBoard = (req, res) => {
   res.status(200).send('Admin Content.');
 };
+
 
 exports.moderatorBoard = (req, res) => {
   res.status(200).send('Moderator Content.');
@@ -89,10 +87,7 @@ exports.profileTemplate = (req, res) => {
           roles.push(userRoles[i].name);
         }
 
-        const d = new Date(user.registration);
-        const date = `${d.getFullYear()}/${('0' + (d.getMonth() + 1)).slice(-2)}/${('0' + d.getDate()).slice(-2)}`;
-        const time = `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}`;
-        const registration = `${date} - ${time}`;
+        const registration = Utils.formatDate(user.registration);
         global.Logger.info('Rendering template for the /profile page');
         res.render('partials/user/profile', {
           layout: 'user',
@@ -132,7 +127,13 @@ exports.profileEditTemplate = (req, res) => {
 
 exports.delete = (req, res) => {
   global.Logger.info('Request GET API call on /api/user/delete');
-  User.findById(req.userId, (userFindErr, user) => {
+  let id = req.userId;
+  // Delete come from a post request
+  if (req.body.userId) {
+    id = req.body.userId;
+  }
+
+  User.findById(id, (userFindErr, user) => {
     const stopExec = global.Logger.reqError({
       res: res,
       code: 'B_INTERNAL_ERROR_USER_FIND',
@@ -150,7 +151,7 @@ exports.delete = (req, res) => {
         if (stopExec) { return; }
 
         // Remove user id from godfather children array
-        const index = godfather.children.indexOf(req.userId);
+        const index = godfather.children.indexOf(id);
         if (index > -1) {
           godfather.children.splice(index, 1);
         }
@@ -159,7 +160,7 @@ exports.delete = (req, res) => {
           connectChildrenToGodfather(godfather, user.children[i]);
         }
         // Finally delete account safely
-        User.deleteOne({ _id: user._id},  err => {
+        User.deleteOne({ _id: user._id },  err => {
           const stopExec = global.Logger.reqError({
             res: res,
             code: 'B_INTERNAL_ERROR_USER_DELETE',
@@ -259,6 +260,28 @@ exports.updateInfo = (req, res) => {
           email: taken.email
         }
       });
+    });
+  });
+};
+
+
+exports.updateRole = (req, res) => {
+  console.log('da')
+  User.findById(req.body.userId, (userFindErr, user) => {
+    // TODO not remove admin from first account
+    if (req.body.checked === true) {
+      user.roles.push(req.body.roleId);
+    } else {
+      const index = user.roles.indexOf(req.body.roleId);
+      if (index !== -1) {
+        user.roles.splice(index, 1);
+      }
+    }
+
+    user.save(saveErr => {});
+    res.status(200).send({
+      status: 200,
+      code: 'B_USER_ROLE_UPDATED'
     });
   });
 };

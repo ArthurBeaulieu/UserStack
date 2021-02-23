@@ -36,7 +36,7 @@ isAdmin = (req, res, next) => {
       res.status(500).send({ message: err });
       return;
     }
-
+    // TODO test if !user
     Role.find(
       {
         _id: { $in: user.roles }
@@ -171,12 +171,9 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
 };
 
 
-const authMiddleware = {
+module.exports = {
   verifyToken,
   isAdmin,
   isModerator,
   checkDuplicateUsernameOrEmail
 };
-
-
-module.exports = authMiddleware;

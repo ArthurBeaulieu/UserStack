@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Utils = require('./server.utils');
 
 
 class Logger {
@@ -31,9 +32,8 @@ class Logger {
 
   raise(options) {
     const d = new Date();
-    const date = `${d.getFullYear()}/${('0' + (d.getMonth() + 1)).slice(-2)}/${('0' + d.getDate()).slice(-2)}`;
-    const time = `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}`;
-    const output = `[${options.verb.toUpperCase()}] ${date}-${time} : ${options.message}`;
+    const date = Utils.formatDate();
+    const output = `[${options.verb.toUpperCase()}] ${date} : ${options.message}`;
     if (this._debug) {
       let color = '\x1b[0m';
       if (options.verb === 'error') {

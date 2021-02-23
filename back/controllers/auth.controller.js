@@ -2,16 +2,11 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const Utils = require('../utils/server.utils');
 
 
 const User = db.user;
 const Role = db.role;
-
-
-const genInviteCode = () => {
-  return crypto.randomBytes(20).toString('hex').toUpperCase();
-};
 
 
 const insertNewUser = opts => {
@@ -47,7 +42,7 @@ const insertNewUser = opts => {
       } else {
         // Update new user and its godfather information
         global.Logger.info(`Updating ${godfather.username} invite code and add ${opts.user.username} to children list`);
-        godfather.code = genInviteCode();
+        godfather.code = Utils.genInviteCode();
         godfather.children.push(opts.user._id);
         godfather.save(godfatherUpdateError => { if (godfatherUpdateError) { console.error(godfatherUpdateError); }});
         opts.user.depth = godfather.depth + 1;
@@ -247,7 +242,7 @@ exports.registerPost = (req, res) => {
   const user = new User({
     username: form.username,
     email: form.email,
-    code: genInviteCode(),
+    code: Utils.genInviteCode(),
     password: bcrypt.hashSync(form.pass1, 8),
     depth: 0, // Init with depth 0, updated later in godfather checks
   });
