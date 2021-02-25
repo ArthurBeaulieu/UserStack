@@ -1,9 +1,14 @@
 const db = require('../models');
+const UserHelper = require('../helpers/user.helper');
+const RoleHelper = require('../helpers/user.helper');
 const Utils = require('../utils/server.utils');
 
 
 const User = db.user;
 const Role = db.role;
+
+
+/* Exports */
 
 
 exports.adminTemplate = (req, res) => {
@@ -19,8 +24,8 @@ exports.adminUsersTemplate = (req, res) => {
   const usersFormatted = [];
 
   promises.push(new Promise(resolve => {
-    User.find({}, (userFindErr, users) => {
-      Role.find({}, (roleFindErr, roles) => {
+    UserHelper.getAll().then(users => {
+      RoleHelper.getAll().then(roles => {
         for (let i = 0; i < users.length; ++i) {
           let userRoles = [];
 
@@ -62,7 +67,11 @@ exports.adminUsersTemplate = (req, res) => {
 
           usersFormatted.push(user);
         }
+      }).catch(err => {
+        global.Logger.error(`Unable to retrieve all roles, ${err}`);
       });
+    }).catch(err => {
+      global.Logger.error(`Unable to retrieve all users, ${err}`);
     });
     resolve();
   }));

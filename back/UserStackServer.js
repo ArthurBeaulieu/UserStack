@@ -1,9 +1,11 @@
 /* App requirements */
 const express = require('express');
 const handlebars = require('express-handlebars');
+const i18n = require('i18n');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const path = require('path');
 
 const { authMiddleware } = require('./middlewares');
 const Logger = require('./utils/Logger');
@@ -12,7 +14,6 @@ const Logger = require('./utils/Logger');
 global.Logger = new Logger({
   debug: true
 });
-
 
 global.Logger.info('Starting UserStack server...');
 const mzk = express();
@@ -31,13 +32,32 @@ const dbConfig = require('./config/db.config');
 const Role = db.role;
 
 
+/* i18n */
+i18n.configure({
+  locales: ['en', 'fr'],
+  cookie: 'locale',
+  directory: path.join(__dirname, '../assets/locales'),
+  defaultLocale: 'en'
+});
+
+
 /* Template engine */
 mzk.set('view engine', 'handlebars');
 mzk.set('views', `${__dirname}/views`);
 mzk.engine('handlebars', handlebars({
+  defaultLayout: 'index',
   layoutsDir: `${__dirname}/views/layouts`,
-  partialsDir: `${__dirname}/views/partials`
+  partialsDir: `${__dirname}/views/partials`,
+  helpers: {
+    i18n: () => {
+      return i18n.__.apply(this, arguments);
+    },
+    __n: () => {
+      return i18n.__n.apply(this, arguments);
+    }
+  }
 }));
+mzk.use(i18n.init);
 
 
 /* Routing */
