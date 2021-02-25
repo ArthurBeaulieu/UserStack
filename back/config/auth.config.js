@@ -1,5 +1,5 @@
 module.exports = {
-  secret: 'mzk-secret-key',
+  secret: 'userstack-secret-key',
   passwordLength: 8,
   maxDepth: 2
 };

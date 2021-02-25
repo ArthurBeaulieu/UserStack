@@ -1,9 +1,8 @@
 const { authMiddleware } = require('../middlewares');
+const controller = require('../controllers/app.controller');
 
 
 module.exports = mzk => {
-  mzk.get('/', [authMiddleware.verifyToken], (req, res) => {
-    global.Logger.info('Rendering template for the / page');
-    res.render('main', { layout : 'index' });
-  });
+  mzk.get('/', controller.publicHomepageTemplate);
+  mzk.get('/home', [authMiddleware.verifyToken], controller.homepageTemplate);
 };

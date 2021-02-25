@@ -2,12 +2,12 @@ const { authMiddleware } = require('../middlewares');
 const controller = require('../controllers/auth.controller');
 
 
-module.exports = mzk => {
-  mzk.post('/api/auth/login', controller.loginPost);
-  mzk.get('/login', controller.loginTemplate);
+module.exports = app => {
+  app.get('/login', controller.loginTemplate);
+  app.post('/api/auth/login', controller.loginPost);
 
-  mzk.post('/api/auth/register', [authMiddleware.checkDuplicateUsernameOrEmail], controller.registerPost);
-  mzk.get('/register', controller.registerTemplate);
+  app.get('/register', controller.registerTemplate);
+  app.post('/api/auth/register', [authMiddleware.checkDuplicateUsernameOrEmail], controller.registerPost);
 
-  mzk.get('/logout', controller.logout);
+  app.get('/logout', controller.logout);
 };

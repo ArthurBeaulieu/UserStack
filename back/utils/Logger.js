@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Utils = require('./server.utils');
+const utils = require('./server.utils');
 
 
 class Logger {
@@ -16,7 +16,7 @@ class Logger {
 
 
   _prepareFileLogging() {
-    const filePath = `${path.dirname(require.main.filename)}/log/MzkLog-${this._date}.log`;
+    const filePath = `${path.dirname(require.main.filename)}/log/Log-${this._date}.log`;
     if (!fs.existsSync(filePath)) {
       // Create folder
       if (!fs.existsSync(`${path.dirname(require.main.filename)}/log/`)) {
@@ -32,7 +32,7 @@ class Logger {
 
   raise(options) {
     const d = new Date();
-    const date = Utils.formatDate();
+    const date = utils.formatDate();
     const output = `[${options.verb.toUpperCase()}] ${date} : ${options.message}`;
     if (this._debug) {
       let color = '\x1b[0m';
@@ -47,7 +47,7 @@ class Logger {
     const logDate = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
     if (this._date !== logDate) {
       this._date = logDate;
-      this._logFile = `${path.dirname(require.main.filename)}/log/MzkLog-${this._date}.log`;
+      this._logFile = `${path.dirname(require.main.filename)}/log/Log-${this._date}.log`;
     }
     this._prepareFileLogging();
     // Dump raised issue into log file

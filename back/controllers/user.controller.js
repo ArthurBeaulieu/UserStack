@@ -266,7 +266,6 @@ exports.updateInfo = (req, res) => {
 
 
 exports.updateRole = (req, res) => {
-  console.log('da')
   User.findById(req.body.userId, (userFindErr, user) => {
     // TODO not remove admin from first account
     if (req.body.checked === true) {

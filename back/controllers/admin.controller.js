@@ -1,6 +1,6 @@
 const db = require('../models');
 const UserHelper = require('../helpers/user.helper');
-const RoleHelper = require('../helpers/user.helper');
+const RoleHelper = require('../helpers/role.helper');
 const Utils = require('../utils/server.utils');
 
 

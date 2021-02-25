@@ -1,5 +1,6 @@
 {
-	"index": "UserStack - Page d'Accueil",
+	"index": "UserStack - Page Publique",
+	"home": "UserStack - Page d'accueil",
 	"user": "UserStack - Utilisateur",
 	"admin": "UserStack - Administration",
 	"auth": "UserStack - Authentification"

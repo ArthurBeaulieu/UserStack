@@ -92,7 +92,7 @@ const insertNewUser = opts => {
         opts.res.status(200).send({
           status: 200,
           code: 'B_REGISTER_SUCCESS',
-          url: '/'
+          url: '/home'
         });
       });
     });
@@ -122,7 +122,7 @@ const finalizeLogin = opts => {
   opts.res.status(200).send({
     status: 200,
     code: 'B_LOGIN_SUCCESS',
-    url: '/'
+    url: '/home'
   });
 };
 
