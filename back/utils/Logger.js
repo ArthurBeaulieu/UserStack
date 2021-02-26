@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const utils = require('./server.utils');
+const i18n = require('i18n'); // Build response messages using i18n errors
+const text = require('./logger.json'); // Server console logging messages in english, no need for i18n
 
 
-class Logger {
+class logger {
 
 
   constructor(options) {
@@ -33,15 +35,15 @@ class Logger {
   raise(options) {
     const d = new Date();
     const date = utils.formatDate();
-    const output = `[${options.verb.toUpperCase()}] ${date} : ${options.message}`;
+    const output = `[${options.type.toUpperCase()}] ${date} : ${options.message}`;
     if (this._debug) {
       let color = '\x1b[0m';
-      if (options.verb === 'error') {
+      if (options.type === 'error') {
         color = '\x1b[31m';
-      } else if (options.verb === 'warn') {
+      } else if (options.type === 'warn') {
         color = '\x1b[33m';
       }
-      console[options.verb](`${color}%s\x1b[0m`, output);
+      console[options.type](`${color}%s\x1b[0m`, output);
     }
     // Day changed, creating new log file
     const logDate = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
@@ -57,7 +59,7 @@ class Logger {
 
   error(message) {
     this.raise({
-      verb: 'error',
+      type: 'error',
       message: message
     });
   }
@@ -65,7 +67,7 @@ class Logger {
 
   warn(message) {
     this.raise({
-      verb: 'warn',
+      type: 'warn',
       message: message
     });
   }
@@ -73,33 +75,33 @@ class Logger {
 
   info(message) {
     this.raise({
-      verb: 'log',
+      type: 'log',
       message: message
     })
   }
 
 
-  reqError(opts) {
-    if (opts.err) {
-      // TODO retrieve status from opts.code in associated JSON (i18n ?)
-      opts.res.status(500).send({
-        status: 500,
-        code: opts.code,
-        message: 'Hey ho',
-        info: opts.info || null
-      });
-      this.raise({
-        verb: 'error', // todo, get from associated JSON,
-        message: opts.err
-      });
-      return true;
+  logFromCode(code, msg = '') {
+    if (text[code]) {
+      const additionalMsg = (msg) ? ` : ${msg}` : '';
+      this[text[code].type](text[code].log + additionalMsg);
     }
+  }
 
-    return false;
+
+  buildResponseFromCode(code, opts = {}, msg) {
+    if (text[code]) {
+      this.logFromCode(code, msg);
+      return Object.assign({
+        code: code,
+        status: text[code].status,
+        message: i18n.__(`errors.${code}`, msg)
+      }, opts);
+    }
   }
 
 
 }
 
 
-module.exports = Logger;
+module.exports = logger;

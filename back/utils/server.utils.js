@@ -21,34 +21,63 @@ exports.formatDate = rawDate => {
 
 
 exports.initSequence = () => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     global.Logger.info('UserStack init sequence to control the database state');
     const promises = [];
     // Check user roles collection
-    promises.push(new Promise(resolve => {
+    promises.push(new Promise((resolve, reject) => {
       Role.estimatedDocumentCount((err, count) => {
         if (!err && count === 0) {
+          const rolePromises = [];
           global.Logger.info('Creating Roles for current instance...');
-          new Role({ name: 'user' }).save(err => {
-            if (err) { global.Logger.error(`Unable to add User role to the roles collection : ${err}`); }
-            global.Logger.info('User role has been added to the roles collection');
+          rolePromises.push(new Promise((resolve, reject) => {
+            new Role({ name: 'user' }).save(roleSaveErr => {
+              if (roleSaveErr) {
+                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
+                reject();
+              } else {
+                global.Logger.info('User role has been added to the roles collection');
+                resolve();
+              }
+            });
+          }));
+          rolePromises.push(new Promise((resolve, reject) => {
+            new Role({ name: 'moderator' }).save(roleSaveErr => {
+              if (roleSaveErr) {
+                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
+                reject();
+              } else {
+                global.Logger.info('Moderator role has been added to the roles collection');
+                resolve();
+              }
+            });
+          }));
+          rolePromises.push(new Promise((resolve, reject) => {
+            new Role({ name: 'admin' }).save(roleSaveErr => {
+              if (roleSaveErr) {
+                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
+                reject();
+              } else {
+                global.Logger.info('Admin role has been added to the roles collection');
+                resolve();
+              }
+            });
+          }));
+          Promise.all(rolePromises).then(() => {
+            global.Logger.info('Roles collection is up to date');
+            resolve();
+          }).catch(() => {
+            reject();
           });
-          new Role({ name: 'moderator' }).save(err => {
-            if (err) { global.Logger.error(`Unable to add Moderator role to the roles collection : ${err}`); }
-            global.Logger.info('Moderator role has been added to the roles collection');
-          });
-          new Role({ name: 'admin' }).save(err => {
-            if (err) { global.Logger.error(`Unable to add Admin role to the roles collection : ${err}`); }
-            global.Logger.info('Admin role has been added to the roles collection');
-          });
+        } else {
+          global.Logger.info('Roles collection is up to date');
+          resolve();
         }
-        global.Logger.info('Roles collection is up to date');
-        resolve();
       });
     }));
     Promise.all(promises).then(() => {
       global.Logger.info('Database model is complete');
       resolve();
-    });
+    }).catch(reject);
   });
 };

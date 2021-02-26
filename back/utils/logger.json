@@ -1,0 +1,87 @@
+{
+  "B_LOGIN_INVALID_FIELD": {
+    "type": "error",
+    "status": 400,
+    "log": "Login POST submission does not contain a username and/or a password"
+  },
+  "B_LOGIN_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Login submission has been refused because some fields are not filled"
+  },
+  "B_LOGIN_USER_NOT_FOUND": {
+    "type": "warn",
+    "status": 404,
+    "log": "Login submission is refused because the provided username or email is not registered"
+  },
+  "B_LOGIN_INVALID_PASSWORD": {
+    "type": "warn",
+    "status": 401,
+    "log": "Login submission is refused because the password does not match the provided user"
+  },
+  "B_LOGIN_SUCCESS": {
+    "type": "info",
+    "status": 200,
+    "log": "Login submission successful for"
+  },
+  "B_REGISTER_INVALID_FIELD": {
+    "type": "error",
+    "status": 400,
+    "log": "Register POST submission does not contain a mandatory field in username, email, code, pass1 and pass2"
+  },
+  "B_REGISTER_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Register submission has been refused because some fields are not filled"
+  },
+  "B_REGISTER_DIFFERENT_PASSWORDS": {
+    "type": "warn",
+    "status": 400,
+    "log": "Register submission has been refused because the two passwords do not match"
+  },
+  "B_REGISTER_PASSWORD_TOO_SHORT": {
+    "type": "warn",
+    "status": 400,
+    "log": "Register submission has been refused because the password must have a minimal length of"
+  },
+  "B_REGISTER_INVALID_CODE": {
+    "type": "warn",
+    "status": 400,
+    "log": "The provided invitation code is invalid or expired"
+  },
+  "B_REGISTER_SUCCESS": {
+    "type": "info",
+    "status": 200,
+    "log": "Register submission successful for"
+  },
+  "B_INTERNAL_ERROR_USER_FIND": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to find user in Users collection"
+  },
+  "B_INTERNAL_ERROR_USER_SAVE": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to save user in Users collection"
+  },
+  "B_INTERNAL_ERROR_USER_COUNT": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to count users in Users collection"
+  },
+  "B_INTERNAL_ERROR_USER_DELETE": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to delete user in Users collection"
+  },
+  "B_INTERNAL_ERROR_ROLE_FIND": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to find role in Roles collection"
+  },
+  "B_INTERNAL_ERROR_ROLE_SAVE": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to save role in Roles collection"
+  }
+}

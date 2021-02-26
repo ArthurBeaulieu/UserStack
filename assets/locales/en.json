@@ -3,5 +3,24 @@
 	"home": "UserStack - Homepage",
 	"user": "UserStack - User",
 	"admin": "UserStack - Administration",
-	"auth": "UserStack - Authentification"
+	"auth": "UserStack - Authentification",
+	"errors": {
+		"B_LOGIN_INVALID_FIELD": "Data sent to the server does not contain a username and/or a password",
+		"B_LOGIN_MISSING_FIELD": "One or several field are empty, please fill them all before submitting your login form",
+		"B_LOGIN_USER_NOT_FOUND": "No user registered for this username or this email",
+		"B_LOGIN_INVALID_PASSWORD": "Provided password is invalid for %s",
+		"B_LOGIN_SUCCESS": "Logged in successfully",
+		"B_REGISTER_INVALID_FIELD": "Data sent to the server does not contain a mandatory field in username, email, code, pass1 and pass2",
+		"B_REGISTER_MISSING_FIELD": "One or several field are empty, please fill them all before submitting your registration form",
+		"B_REGISTER_DIFFERENT_PASSWORDS": "The two provided passwords are not matching",
+		"B_REGISTER_PASSWORD_TOO_SHORT": "Password must be at least %s characters",
+		"B_REGISTER_INVALID_CODE": "Register submission is refused because invite code is invalid",
+		"B_REGISTER_SUCCESS": "Registered successfully",
+		"B_INTERNAL_ERROR_USER_FIND": "Database error when trying to find user in Users collection",
+		"B_INTERNAL_ERROR_USER_SAVE": "Database error when trying to save user in Users collection",
+		"B_INTERNAL_ERROR_USER_COUNT": "Database error when trying to count users in Users collection",
+		"B_INTERNAL_ERROR_USER_DELETE": "Database error when trying to delete user in Users collection",
+		"B_INTERNAL_ERROR_ROLE_FIND": "Database error when trying to find role in Roles collection",
+		"B_INTERNAL_ERROR_ROLE_SAVE": "Database error when trying to save role in Roles collection"
+	}
 }

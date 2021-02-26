@@ -1,7 +1,7 @@
 const config = require('../config/auth.config');
 const db = require('../models');
 const bcrypt = require('bcryptjs');
-const Utils = require('../utils/server.utils');
+const utils = require('../utils/server.utils');
 
 
 const User = db.user;
@@ -10,15 +10,23 @@ const Role = db.role;
 
 const connectChildrenToGodfather = (godfather, userId) => {
   User.findById(userId, (userFindErr, user) => {
-    // TODO handle no user error
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      global.Logger.logFromCode('B_INTERNAL_ERROR_USER_FIND', userFindErr);
+      return;
+    }
     godfather.children.push(user._id);
     user.parent = godfather._id;
     --user.depth;
     if (user.code === '') {
-      user.code = Utils.genInviteCode();
+      user.code = utils.genInviteCode(); // Generate new invite code as user depth has been reduced from one level
     }
-    user.save(userUpdateErr => {});
-    godfather.save(userUpdateErr => {});
+    godfather.save(userSaveErr => {
+      global.Logger.logFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+    });
+    user.save(userSaveErr => {
+      global.Logger.logFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+    });
   });
 };
 
@@ -26,35 +34,15 @@ const connectChildrenToGodfather = (godfather, userId) => {
 /* Exports */
 
 
-exports.allAccess = (req, res) => {
-  res.status(200).send('Public Content.');
-};
-
-
-exports.userBoard = (req, res) => {
-  res.status(200).send('User Content.');
-};
-
-
-exports.adminBoard = (req, res) => {
-  res.status(200).send('Admin Content.');
-};
-
-
-exports.moderatorBoard = (req, res) => {
-  res.status(200).send('Moderator Content.');
-};
-
-
 exports.profileTemplate = (req, res) => {
   global.Logger.info('Request template for the /profile page');
   User.findById(req.userId, (userFindErr, user) => {
-    const stopExec = global.Logger.reqError({
-      res: res,
-      code: 'B_INTERNAL_ERROR_USER_FIND',
-      err: userFindErr
-    });
-    if (stopExec) { return; }
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
 
     if (!user) {
       global.Logger.info('Request refused for the /profile template because user was not found');
@@ -63,31 +51,32 @@ exports.profileTemplate = (req, res) => {
     }
 
     User.findById(user.parent, (godfatherFindErr, godfatherUser) => {
-      const stopExec = global.Logger.reqError({
-        res: res,
-        code: 'B_INTERNAL_ERROR_USER_FIND',
-        err: godfatherFindErr
-      });
-      if (stopExec) { return; }
+      // Internal server error when trying to retrieve user from database
+      if (userFindErr) {
+        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+        res.status(responseObject.status).send(responseObject);
+        return;
+      }
 
       let godfather = 'Jesus';
       if (godfatherUser) {
         godfather = godfatherUser.username;
       }
+
       Role.find({ _id: user.roles }, (roleFindErr, userRoles) => {
-        const stopExec = global.Logger.reqError({
-          res: res,
-          code: 'B_INTERNAL_ERROR_ROLE_FIND',
-          err: roleFindErr
-        });
-        if (stopExec) { return; }
+        // Internal server error when trying to retrieve role from database
+        if (roleFindErr) {
+          const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_ROLE_FIND', {}, roleFindErr);
+          opts.res.status(responseObject.status).send(responseObject);
+          return;
+        }
 
         const roles = [];
         for (let i = 0; i < userRoles.length; ++i) {
           roles.push(userRoles[i].name);
         }
 
-        const registration = Utils.formatDate(user.registration);
+        const registration = utils.formatDate(user.registration);
         global.Logger.info('Rendering template for the /profile page');
         res.render('partials/user/profile', {
           layout: 'user',
@@ -108,12 +97,12 @@ exports.profileTemplate = (req, res) => {
 exports.profileEditTemplate = (req, res) => {
   global.Logger.info('Request template for the /profile/edit page');
   User.findById(req.userId, (userFindErr, user) => {
-    const stopExec = global.Logger.reqError({
-      res: res,
-      code: 'B_INTERNAL_ERROR_USER_FIND',
-      err: userFindErr
-    });
-    if (stopExec) { return; }
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
 
     global.Logger.info('Rendering template for the /profile/edit page');
     res.render('partials/user/edit', {
@@ -134,21 +123,21 @@ exports.delete = (req, res) => {
   }
 
   User.findById(id, (userFindErr, user) => {
-    const stopExec = global.Logger.reqError({
-      res: res,
-      code: 'B_INTERNAL_ERROR_USER_FIND',
-      err: userFindErr
-    });
-    if (stopExec) { return; }
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
 
     if (user.parent) {
       User.findById(user.parent, (userFindErr, godfather) => {
-        const stopExec = global.Logger.reqError({
-          res: res,
-          code: 'B_INTERNAL_ERROR_USER_FIND',
-          err: userFindErr
-        });
-        if (stopExec) { return; }
+        // Internal server error when trying to retrieve user from database
+        if (userFindErr) {
+          const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+          res.status(responseObject.status).send(responseObject);
+          return;
+        }
 
         // Remove user id from godfather children array
         const index = godfather.children.indexOf(id);
@@ -160,13 +149,13 @@ exports.delete = (req, res) => {
           connectChildrenToGodfather(godfather, user.children[i]);
         }
         // Finally delete account safely
-        User.deleteOne({ _id: user._id },  err => {
-          const stopExec = global.Logger.reqError({
-            res: res,
-            code: 'B_INTERNAL_ERROR_USER_DELETE',
-            err: err
-          });
-          if (stopExec) { return; }
+        User.deleteOne({ _id: user._id },  userDeleteErr => {
+          // Internal server error when trying to retrieve role from database
+          if (userDeleteErr) {
+            const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_DELETE', {}, userDeleteErr);
+            res.status(responseObject.status).send(responseObject);
+            return;
+          }
 
           res.status(200).send({
             status: 200,
@@ -267,6 +256,13 @@ exports.updateInfo = (req, res) => {
 
 exports.updateRole = (req, res) => {
   User.findById(req.body.userId, (userFindErr, user) => {
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
+
     // TODO not remove admin from first account
     if (req.body.checked === true) {
       user.roles.push(req.body.roleId);
@@ -277,10 +273,16 @@ exports.updateRole = (req, res) => {
       }
     }
 
-    user.save(saveErr => {});
-    res.status(200).send({
-      status: 200,
-      code: 'B_USER_ROLE_UPDATED'
+    user.save(userSaveErr => {
+      if (userSaveErr) {
+        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+        res.status(responseObject.status).send(responseObject);
+      } else {
+        res.status(200).send({
+          status: 200,
+          code: 'B_USER_ROLE_UPDATED'
+        });
+      }
     });
   });
 };

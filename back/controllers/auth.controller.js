@@ -2,68 +2,84 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const Utils = require('../utils/server.utils');
+const utils = require('../utils/server.utils');
 
 
 const User = db.user;
 const Role = db.role;
 
 
-const insertNewUser = opts => {
+const finalizeLogin = opts => {
+  if (!bcrypt.compareSync(opts.form.password, opts.user.password)) {
+    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_PASSWORD', {}, opts.user.username);
+    opts.res.status(responseObject.status).send(responseObject);
+    return;
+  }
+  // Update user last login and save it to the database
+  opts.user.lastlogin = new Date();
+  opts.user.save(userSaveErr => {
+    if (userSaveErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+      opts.res.status(responseObject.status).send(responseObject);
+      return;
+    }
+    // Only create token for user if save was successful
+    const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: 86400 });
+    // Cookie expires in one day for session
+    opts.res.cookie('jwtToken', token, { maxAge: 8640000, httpOnly: true });
+    // Send proper redirection after login
+    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_SUCCESS', { url: '/home' }, opts.user.username);
+    opts.res.status(responseObject.status).send(responseObject);
+  });
+};
+
+
+const finalizeRegistration = opts => {
+  // TODO replace GGJESUS with config set one
   if (opts.firstAccount && opts.form.code !== 'GGJESUS') {
-    global.Logger.warn('Register submission is refused because invite code is invalid');
-    opts.res.status(400).send({
-      status: 400,
-      code: 'B_REGISTER_INVALID_CODE',
-      message: 'The provided invitation code is invalid or expired.'
-    });
+    const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_CODE');
+    opts.res.status(responseObject.status).send(responseObject);
     return;
   }
   // Search for existing parent
   User.findOne({ code: opts.form.code }, (userFindErr, godfather) => {
-    const stopExec = global.Logger.reqError({
-      res: opts.res,
-      code: 'B_INTERNAL_ERROR_USER_FIND',
-      err: userFindErr
-    });
-    if (stopExec) { return; }
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      opts.res.status(responseObject.status).send(responseObject);
+      return;
+    }
     // User hierarchy update if not first register on app
     if (!opts.firstAccount) {
       // First account invite code is handle before
       if (!godfather) {
-        // Invite code is invalid
-        global.Logger.warn('Register submission is refused because invite code is invalid');
-        opts.res.status(400).send({
-          status: 400,
-          code: 'B_REGISTER_INVALID_CODE',
-          message: 'The provided invitation code is invalid or expired.'
-        });
+        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_CODE');
+        opts.res.status(responseObject.status).send(responseObject);
         return;
       } else {
         // Update new user and its godfather information
-        global.Logger.info(`Updating ${godfather.username} invite code and add ${opts.user.username} to children list`);
-        godfather.code = Utils.genInviteCode();
+        global.Logger.info(`Updating ${godfather.username} code and add ${opts.user.username} to its children list`);
+        godfather.code = utils.genInviteCode();
         godfather.children.push(opts.user._id);
-        godfather.save(godfatherUpdateError => { if (godfatherUpdateError) { console.error(godfatherUpdateError); }});
         opts.user.depth = godfather.depth + 1;
         opts.user.parent = godfather._id;
         if (opts.user.depth >= config.maxDepth) {
-          // Remove invite code is max depth is reached
-          opts.user.code = '';
+          opts.user.code = ''; // Remove invite code if max depth is reached
         }
       }
     }
     // Retrieve roles from model
     Role.find({ name: ['user', 'admin'] }, (roleFindErr, roles) => {
-      const stopExec = global.Logger.reqError({
-        res: opts.res,
-        code: 'B_INTERNAL_ERROR_ROLE_FIND',
-        err: roleFindErr
-      });
-      if (stopExec) { return; }
+      // Internal server error when trying to retrieve role from database
+      if (roleFindErr) {
+        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_ROLE_FIND', {}, roleFindErr);
+        opts.res.status(responseObject.status).send(responseObject);
+        return;
+      }
+      // Create dates for user
       opts.user.registration = new Date();
       opts.user.lastlogin = new Date();
-      // Create super user if no previous user in database
+      // Assign role(s) to newly created user
       opts.user.roles = [];
       for (let i = 0; i < roles.length; ++i) {
         // Grant user role by default
@@ -75,54 +91,43 @@ const insertNewUser = opts => {
           opts.user.roles.push(roles[i]._id);
         }
       }
-      // Update user with roles
-      opts.user.save(userUpdateErr => {
-        const stopExec = global.Logger.reqError({
-          res: opts.res,
-          code: 'B_INTERNAL_ERROR_USER_SAVE',
-          err: userUpdateErr
+      // Database save for user and its godfather promised to avoid internal errors
+      const promises = [];
+      // Update godfather with new children and code
+      if (godfather) {
+        promises.push(new Promise((resolve, reject) => {
+          godfather.save(userSaveErr => {
+            if (userSaveErr) {
+              reject(userSaveErr);
+            } else {
+              resolve();
+            }
+          });
+        }));
+      }
+      // Save new user with roles
+      promises.push(new Promise((resolve, reject) => {
+        opts.user.save(userSaveErr => {
+          if (userSaveErr) {
+            reject(userSaveErr);
+          } else {
+            resolve();
+          }
         });
-        if (stopExec) { return; }
-        const token = jwt.sign({ id: opts.user.id }, config.secret, {
-          expiresIn: 86400
-        });
-        // Cookie expires in one day
+      }));
+      // Redirect client when all saves are OK
+      Promise.all(promises).then(() => {
+        // Session cookie expires in one day
+        const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: 86400 });
         opts.res.cookie('jwtToken', token, { maxAge: 8640000, httpOnly: true });
-        global.Logger.info(`Register submission for ${opts.user.username} is successful`);
-        opts.res.status(200).send({
-          status: 200,
-          code: 'B_REGISTER_SUCCESS',
-          url: '/home'
-        });
+        // Send proper redirection after registration
+        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_SUCCESS', { url: '/home' }, opts.user.username);
+        opts.res.status(responseObject.status).send(responseObject);
+      }).catch(userSaveErr => {
+        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+        opts.res.status(responseObject.status).send(responseObject);
       });
     });
-  });
-};
-
-
-const finalizeLogin = opts => {
-  if (!bcrypt.compareSync(opts.form.password, opts.user.password)) {
-    global.Logger.warn('Login submission is refused because password does not match the provided user');
-    opts.res.status(401).send({
-      status: 401,
-      code: 'B_LOGIN_INVALID_PASSWORD',
-      message: 'Provided password is invalid for user.'
-    });
-    return;
-  }
-
-  opts.user.lastlogin = new Date();
-  opts.user.save(saveErr => {});
-  const token = jwt.sign({ id: opts.user.id }, config.secret, {
-    expiresIn: 86400
-  });
-  // Cookie expires in one day
-  opts.res.cookie('jwtToken', token, { maxAge: 8640000, httpOnly: true });
-  global.Logger.info(`Login submission for ${opts.user.username} is successful`);
-  opts.res.status(200).send({
-    status: 200,
-    code: 'B_LOGIN_SUCCESS',
-    url: '/home'
   });
 };
 
@@ -130,51 +135,58 @@ const finalizeLogin = opts => {
 /* Exported methods */
 
 
+exports.loginTemplate = (req, res) => {
+  global.Logger.info('Rendering template for the /login page');
+  res.render('partials/auth/login', { layout: 'auth' });
+};
+
+
 exports.loginPost = (req, res) => {
   global.Logger.info('Request POST API call on /api/auth/login');
   const form = req.body;
+  // Prevent wrong arguments sent to POST
+  if (!form.username || !form.password) {
+    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_FIELD');
+    res.status(responseObject.status).send(responseObject);
+    return;
+  }
   // Prevent missing arguments from request
   if (form.username === '' || form.password === '') {
-    global.Logger.warn('Login submission is refused because some fields are not filled');
-    res.status(400).send({
-      status: 400,
-      code: 'B_LOGIN_MISSING_FIELD',
-      message: 'One or several field are empty. Please fill them all before submitting your login.',
+    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_MISSING_FIELD', {
       missing: {
         username: !form.username,
         password: !form.password
       }
     });
+    res.status(responseObject.status).send(responseObject);
     return;
   }
   // Search username/email in database then test password matching
-  User.findOne({ username: form.username }).populate('roles', '-__v').exec((userFindErr1, user) => {
-    const stopExec = global.Logger.reqError({
-      res: res,
-      code: 'B_INTERNAL_ERROR_USER_FIND',
-      err: userFindErr1
-    });
-    if (stopExec) { return; }
+  User.findOne({ username: form.username }).populate('roles', '-__v').exec((userFindErr, user) => {
+    // Internal server error when trying to retrieve user from database
+    if (userFindErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
     // Not found by username, try to find user in database by email
     if (!user) {
-      User.findOne({ email: form.username }).populate('roles', '-__v').exec((userFindErr2, user) => {
-        const stopExec = global.Logger.reqError({
-          res: res,
-          code: 'B_INTERNAL_ERROR_USER_FIND',
-          err: userFindErr2
-        });
-        if (stopExec) { return; }
+      global.Logger.info('Did not found a username in database matching the sent login form. Searching for matching email');
+      User.findOne({ email: form.username }).populate('roles', '-__v').exec((userFindErr, user) => {
+        // Internal server error when trying to retrieve user from database
+        if (userFindErr) {
+          const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
+          res.status(responseObject.status).send(responseObject);
+          return;
+        }
         // Not found either with username or email
         if (!user) {
-          global.Logger.warn('Login submission is refused because the provided username or email is not registered.');
-          res.status(404).send({
-            status: 404,
-            code: 'B_LOGIN_USER_NOT_FOUND',
-            message: 'No user registered for username or email.'
-          });
+          const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_USER_NOT_FOUND');
+          res.status(responseObject.status).send(responseObject);
           return;
         }
         // User has been found by email, check its password validity
+        global.Logger.info('Found an email in database matching the sent login form');
         finalizeLogin({
           req: req,
           res: res,
@@ -184,6 +196,7 @@ exports.loginPost = (req, res) => {
       })
     } else {
       // User has been found by username, check its password validity
+      global.Logger.info('Found a username in database matching the sent login form');
       finalizeLogin({
         req: req,
         res: res,
@@ -195,22 +208,24 @@ exports.loginPost = (req, res) => {
 };
 
 
-exports.loginTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the /login page');
-  res.render('partials/auth/login', { layout: 'auth' });
+exports.registerTemplate = (req, res) => {
+  global.Logger.info('Rendering template for the /register page');
+  res.render('partials/auth/register', { layout: 'auth' });
 };
 
 
 exports.registerPost = (req, res) => {
   global.Logger.info('Request POST API call on /api/auth/register');
   const form = req.body;
+  // Prevent wrong arguments sent to POST
+  if (!form.username || !form.email || !form.code || !form.pass1 || !form.pass2) {
+    const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_FIELD');
+    res.status(responseObject.status).send(responseObject);
+    return;
+  }
   // Prevent missing arguments from request
   if (form.username === '' || form.email === '' || form.code === '' || form.pass1 === '' || form.pass2 === '') {
-    global.Logger.warn('Register submission is refused because some fields are not filled');
-    res.status(400).send({
-      status: 400,
-      code: 'B_REGISTER_MISSING_FIELD',
-      message: 'One or several field are empty. Please fill them all before submitting your registration.',
+    const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_MISSING_FIELD', {
       missing: {
         username: !form.username,
         email: !form.email,
@@ -219,57 +234,44 @@ exports.registerPost = (req, res) => {
         pass2: !form.pass2
       }
     });
+    res.status(responseObject.status).send(responseObject);
     return;
   }
   // Password matching verification
   if (form.pass1 !== form.pass2) {
-    global.Logger.warn('Register submission is refused because passwords do not match');
-    res.status(400).send({
-      status: 400,
-      code: 'B_REGISTER_DIFFERENT_PASSWORDS',
-      message: 'The two provided passwords are not matching.'
-    });
+    const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_DIFFERENT_PASSWORDS');
+    res.status(responseObject.status).send(responseObject);
     return;
   }
   // Password length matching auth config length
   if (form.pass1.length < config.passwordLength) {
-    global.Logger.warn('Register submission is refused because password has less than 8 characters');
-    res.status(400).send({
-      status: 400,
-      code: 'B_REGISTER_PASSWORD_TOO_SHORT',
-      message: `Password must be at least ${config.passwordLength} characters`
-    });
+    const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_PASSWORD_TOO_SHORT', {}, config.passwordLength);
+    res.status(responseObject.status).send(responseObject);
     return;
   }
   // Create user from model with form info
   const user = new User({
     username: form.username,
     email: form.email,
-    code: Utils.genInviteCode(),
+    code: utils.genInviteCode(),
     password: bcrypt.hashSync(form.pass1, 8),
     depth: 0, // Init with depth 0, updated later in godfather checks
   });
   // Check whether it's first register or not by counting item in User table
-  User.countDocuments({}, (countErr, count) => {
-    const stopExec = global.Logger.reqError({
-      res: res,
-      code: 'B_INTERNAL_ERROR_USER_COUNT',
-      err: countErr
-    });
-    if (stopExec) { return; }
-    insertNewUser({
+  User.countDocuments({}, (userCountErr, count) => {
+    if (userCountErr) {
+      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_COUNT', {}, userCountErr);
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
+    // Finalize registration
+    finalizeRegistration({
       res: res,
       user: user,
       form: form,
       firstAccount: (count === 0)
     });
   });
-};
-
-
-exports.registerTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the /register page');
-  res.render('partials/auth/register', { layout: 'auth' });
 };
 
 

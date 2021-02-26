@@ -33,7 +33,8 @@ i18n.configure({
   locales: ['en', 'fr'],
   cookie: 'locale',
   directory: path.join(__dirname, '../assets/locales'),
-  defaultLocale: 'en'
+  defaultLocale: 'en',
+  objectNotation: true
 });
 app.use(i18n.init);
 
@@ -83,6 +84,10 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
       global.Logger.info('Gracefully stopping UserStack server');
       process.exit();
     });
+  }).catch(() => {
+    global.Logger.error(`Unable to update database model : ${err}`);
+    global.Logger.error('Gracefully stopping UserStack server');
+    process.exit();
   });
 }).catch(err => {
   global.Logger.error(`Unable to connect to the database : ${err}`);

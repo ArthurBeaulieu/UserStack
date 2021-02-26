@@ -31,9 +31,9 @@ exports.isLoggedIn = req => {
     jwt.verify(token, config.secret, err => {
       if (err) {
         resolve(false);
+      } else {
+        resolve(true);
       }
-
-      resolve(true);
     });
   });
 };
@@ -61,5 +61,4 @@ exports.isAdminUser = user => {
       resolve(false);
     });
   });
-
 };
