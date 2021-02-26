@@ -12,12 +12,12 @@
   "B_LOGIN_USER_NOT_FOUND": {
     "type": "warn",
     "status": 404,
-    "log": "Login submission is refused because the provided username or email is not registered"
+    "log": "Login submission has been refused because the provided username or email is not registered"
   },
   "B_LOGIN_INVALID_PASSWORD": {
     "type": "warn",
     "status": 401,
-    "log": "Login submission is refused because the password does not match the provided user"
+    "log": "Login submission has been refused because the password does not match the provided user"
   },
   "B_LOGIN_SUCCESS": {
     "type": "info",
@@ -53,6 +53,86 @@
     "type": "info",
     "status": 200,
     "log": "Register submission successful for"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Change password POST submission does not contain a mandatory field in pass1, pass2 and pass3"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_EMPTY_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "No password modification were sent, all fields are empty"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Some password fields are empty"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_INVALID_PASSWORD": {
+    "type": "warn",
+    "status": 401,
+    "log": "Update password submission has been refused because the password does not match the provided user"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_DIFFERENT_PASSWORDS": {
+    "type": "warn",
+    "status": 400,
+    "log": "The two provided passwords are not matching"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_SAME_PASSWORDS": {
+    "type": "warn",
+    "status": 400,
+    "log": "Submitted password is the same as current password"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_PASSWORD_TOO_SHORT": {
+    "type": "warn",
+    "status": 400,
+    "log": "Update password submission has been refused because the password must have a minimal length of"
+  },
+  "B_PROFILE_UPDATE_PASSWORD_SUCCESS": {
+    "type": "info",
+    "status": 200,
+    "log": "Password successfully updated"
+  },
+  "B_PROFILE_UPDATE_ROLE_INVALID_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Update role POST submission does not contain a mandatory field in userId, roleId or checked"
+  },
+  "B_PROFILE_UPDATE_ROLE_CANT_REMOVE_ADMIN_FROM_ROOT": {
+    "type": "warn",
+    "status": 400,
+    "log": "Can't revoke admin role from root user"
+  },
+  "B_PROFILE_UPDATE_ROLE_SUCCESS": {
+    "type": "info",
+    "status": 200,
+    "log": "Role successfully updated"
+  },
+  "B_PROFILE_UPDATE_INFO_INVALID_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Data sent to the server does not contain a mandatory field in username and email"
+  },
+  "B_PROFILE_UPDATE_INFO_NO_CHANGES": {
+    "type": "warn",
+    "status": 400,
+    "log": "No changes provided to user information"
+  },
+  "B_PROFILE_UPDATE_INFO_UPDATED": {
+    "type": "info",
+    "status": 200,
+    "log": "Profile info successfully updated"
+  },
+  "B_USER_NOT_FOUND": {
+    "type": "info",
+    "status": 404,
+    "log": "Can not find user in database"
+  },
+  "B_ROLE_NOT_FOUND": {
+    "type": "info",
+    "status": 404,
+    "log": "Can not find role in database"
   },
   "B_INTERNAL_ERROR_USER_FIND": {
     "type": "error",

@@ -17,5 +17,5 @@ class App {
 }
 
 
-window.mzk = new App();
+window.app = new App();
 export default App;

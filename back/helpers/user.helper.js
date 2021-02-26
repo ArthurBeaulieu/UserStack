@@ -7,6 +7,36 @@ const User = db.user;
 const Role = db.role;
 
 
+exports.find = opts => {
+  return new Promise((resolve, reject) => {
+    // Enclosed method to perform standard failure test upon model response
+    const rejection = (userFindErr, user) => {
+      // Internal server error when trying to retrieve user from database
+      if (userFindErr) {
+        const err = new Error(userFindErr);
+        reject({ code: 'B_INTERNAL_ERROR_USER_FIND', err: err.toString() });
+      }
+      // User not found in database
+      if (!user) {
+        reject({ code: 'B_USER_NOT_FOUND' });
+      }
+    };
+    // Find user depending on opts type
+    if (opts.id) { // Find by ID
+      User.findById(opts.id, (userFindErr, user) => {
+        rejection(userFindErr, user);
+        resolve(user);
+      });
+    } else if (opts.filter) {
+        User.findOne(opts.filter).exec((userFindErr, user) => {
+        rejection(userFindErr, user);
+        resolve(user);
+      });
+    }
+  });
+};
+
+
 exports.getAll = () => {
   return new Promise((resolve, reject) => {
     User.find({}, (findErr, users) => {
@@ -48,7 +78,7 @@ exports.isAdminUser = user => {
 
     Role.find({ _id: { $in: user.roles } }, (err, roles) => {
       if (err) {
-        global.Logger.error('Unable to retrieve roles for user')
+        global.Logger.error('Unable to retrieve roles for user');
         reject();
       }
 

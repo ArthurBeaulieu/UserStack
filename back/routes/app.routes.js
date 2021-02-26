@@ -2,7 +2,7 @@ const { authMiddleware } = require('../middlewares');
 const controller = require('../controllers/app.controller');
 
 
-module.exports = mzk => {
-  mzk.get('/', controller.publicHomepageTemplate);
-  mzk.get('/home', [authMiddleware.verifyToken], controller.homepageTemplate);
+module.exports = app => {
+  app.get('/', controller.publicHomepageTemplate);
+  app.get('/home', [authMiddleware.verifyToken], controller.homepageTemplate);
 };

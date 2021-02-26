@@ -10,6 +10,7 @@ const Role = db.role;
 
 
 const finalizeLogin = opts => {
+  // Password not matching the user
   if (!bcrypt.compareSync(opts.form.password, opts.user.password)) {
     const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_PASSWORD', {}, opts.user.username);
     opts.res.status(responseObject.status).send(responseObject);
@@ -35,8 +36,7 @@ const finalizeLogin = opts => {
 
 
 const finalizeRegistration = opts => {
-  // TODO replace GGJESUS with config set one
-  if (opts.firstAccount && opts.form.code !== 'GGJESUS') {
+  if (opts.firstAccount && opts.form.code !== config.adminCode) {
     const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_CODE');
     opts.res.status(responseObject.status).send(responseObject);
     return;
@@ -179,9 +179,9 @@ exports.loginPost = (req, res) => {
           res.status(responseObject.status).send(responseObject);
           return;
         }
-        // Not found either with username or email
+        // User not found either with username or email
         if (!user) {
-          const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_USER_NOT_FOUND');
+          const responseObject = global.Logger.buildResponseFromCode('B_USER_NOT_FOUND');
           res.status(responseObject.status).send(responseObject);
           return;
         }
