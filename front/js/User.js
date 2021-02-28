@@ -103,7 +103,7 @@ if (deleteAccount) {
   const processResponse = res => {
     if (res.status === 200) {
       window.location.href = res.url;
-    } else if (res.code === 'B_NEVER_KILL_JESUS') {
+    } else if (res.code === 'B_NEVER_KILL_ROOT') {
       error.innerHTML = res.message;
     }
   };

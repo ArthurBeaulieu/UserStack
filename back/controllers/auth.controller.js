@@ -71,7 +71,7 @@ const finalizeRegistration = opts => {
       }
     }
     // Retrieve roles from model
-    RoleHelper.get({ filter: { name: ['user', 'admin'] } }).then(roles => {
+    RoleHelper.get({ filter: { name: ['user', 'admin'] }, multiple: true }).then(roles => {
       // Create dates for user
       opts.user.registration = new Date();
       opts.user.lastlogin = new Date();

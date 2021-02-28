@@ -134,6 +134,11 @@
     "status": 200,
     "log": "Profile info successfully updated"
   },
+  "B_USER_DELETE_SUCCESS": {
+    "type": "info",
+    "status": 200,
+    "log": "User successfully deleted from database"
+  },
   "B_USER_NOT_FOUND": {
     "type": "info",
     "status": 404,
@@ -143,6 +148,11 @@
     "type": "info",
     "status": 404,
     "log": "Can not find role in database"
+  },
+  "B_NEVER_KILL_ROOT": {
+    "type": "info",
+    "status": 403,
+    "log": "Deleting root account is not permitted"
   },
   "B_INTERNAL_ERROR_USER_FIND": {
     "type": "error",

@@ -7,9 +7,9 @@ const utils = require('../utils/server.utils');
 
 
 const User = db.user;
-const Role = db.role;
 
 
+// For a given user, connect all its children to its godfather
 const connectChildrenToGodfather = (godfather, userId) => {
   // Find matching user for token ID
   UserHelper.get({ id: userId }).then(user => {
@@ -31,46 +31,20 @@ const connectChildrenToGodfather = (godfather, userId) => {
 };
 
 
-/* Exports */
+/* Exported methods */
 
 
+// Private /profile template (for authenticated users)
 exports.profileTemplate = (req, res) => {
   global.Logger.info('Request template for the /profile page');
-  User.findById(req.userId, (userFindErr, user) => {
-    // Internal server error when trying to retrieve user from database
-    if (userFindErr) {
-      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
-      res.status(responseObject.status).send(responseObject);
-      return;
-    }
-
-    if (!user) {
-      global.Logger.info('Request refused for the /profile template because user was not found');
-      res.redirect(302, '/');
-      return;
-    }
-
+  UserHelper.get({ id: req.userId }).then(user => {
     User.findById(user.parent, (godfatherFindErr, godfatherUser) => {
-      // Internal server error when trying to retrieve user from database
-      if (userFindErr) {
-        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
-        res.status(responseObject.status).send(responseObject);
-        return;
-      }
-
       let godfather = 'Jesus';
       if (godfatherUser) {
         godfather = godfatherUser.username;
       }
 
-      Role.find({ _id: user.roles }, (roleFindErr, userRoles) => {
-        // Internal server error when trying to retrieve role from database
-        if (roleFindErr) {
-          const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_ROLE_FIND', {}, roleFindErr);
-          opts.res.status(responseObject.status).send(responseObject);
-          return;
-        }
-
+      RoleHelper.get({ filter: { _id: user.roles }, multiple: true }).then(userRoles => {
         const roles = [];
         for (let i = 0; i < userRoles.length; ++i) {
           roles.push(userRoles[i].name);
@@ -88,12 +62,24 @@ exports.profileTemplate = (req, res) => {
           registration: registration,
           roles: roles
         });
+      }).catch(opts => {
+        if (opts.err) {
+          const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+          res.status(responseObject.status).send(responseObject);
+        } else {
+          global.Logger.info('Request refused for the /profile template because user was not found');
+          res.redirect(302, '/');
+        }
       });
     });
+  }).catch(opts => {
+    global.Logger.info('Request refused for the /profile template because user was not found');
+    res.redirect(302, '/');
   });
 };
 
 
+// Private /profile/edit template (for authenticated users)
 exports.profileEditTemplate = (req, res) => {
   global.Logger.info('Request template for the /profile/edit page');
   // Find matching user for token ID
@@ -111,6 +97,7 @@ exports.profileEditTemplate = (req, res) => {
 };
 
 
+// Submission from user information submit
 exports.updateInfo = (req, res) => {
   const form = req.body;
   // Prevent wrong arguments sent to POST
@@ -200,6 +187,7 @@ exports.updateInfo = (req, res) => {
 };
 
 
+// Submission from user role checkbox
 exports.updateRole = (req, res) => {
   const form = req.body;
   // Prevent wrong arguments sent to POST
@@ -250,6 +238,7 @@ exports.updateRole = (req, res) => {
 };
 
 
+// Submission from user password fields submit
 exports.updatePassword = (req, res) => {
   const form = req.body;
   // Prevent wrong arguments sent to POST
@@ -322,6 +311,7 @@ exports.updatePassword = (req, res) => {
 };
 
 
+// Submission from user delete button or admin delete user button
 exports.delete = (req, res) => {
   global.Logger.info('Request GET API call on /api/user/delete');
   let id = req.userId;
@@ -350,23 +340,17 @@ exports.delete = (req, res) => {
             res.status(responseObject.status).send(responseObject);
             return;
           }
-
-          res.status(200).send({
-            status: 200,
-            code: 'B_DELETE_USER_SUCCESS',
-            url: '/logout'
-          });
+          // User deletion successful
+          const responseObject = global.Logger.buildResponseFromCode('B_USER_DELETE_SUCCESS', { url: '/logout' });
+          res.status(responseObject.status).send(responseObject);
         });
       }).catch(opts => {
         const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
         res.status(responseObject.status).send(responseObject);
       });
     } else {
-      res.status(403).send({
-        status: 403,
-        code: 'B_NEVER_KILL_JESUS',
-        message: 'You are trying to remove the super account of this website. Operation not allowed'
-      });
+      const responseObject = global.Logger.buildResponseFromCode('B_NEVER_KILL_ROOT');
+      res.status(responseObject.status).send(responseObject);
     }
   }).catch(opts => {
     const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);

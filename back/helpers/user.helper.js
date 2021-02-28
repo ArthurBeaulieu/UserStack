@@ -88,7 +88,7 @@ exports.isAdminUser = user => {
         global.Logger.error('Unable to retrieve roles for user');
         reject();
       }
-
+      console.log(roles, user)
       for (let i = 0; i < roles.length; ++i) {
         if (roles[i].name === 'admin') {
           resolve(true);
