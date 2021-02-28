@@ -11,14 +11,14 @@ isLoggedIn = (req, res, next) => {
   let token = req.cookies.jwtToken;
   if (!token) {
     global.Logger.warn('No valid token where found in cookies. Redirecting to /login');
-    res.redirect('/login');
+    res.redirect(302, '/login');
     return;
   }
   // Check token with jwt token module
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
       global.Logger.error('Access refused, the token is either invalid or expired. Redirecting to /login');
-      res.redirect('/login');
+      res.redirect(302, '/login');
       return;
     }
     // Access granted, call next to exist middleware
@@ -42,14 +42,14 @@ isAdmin = (req, res, next) => {
         }
       }
       global.Logger.info('User does not have the admin role, access refused');
-      res.redirect('/');
+      res.redirect(302, '/');
     }).catch(opts => {
       global.Logger.logFromCode(opts.code, opts.err);
-      res.redirect('/');
+      res.redirect(302, '/');
     });
   }).catch(opts => {
     global.Logger.logFromCode(opts.code, opts.err);
-    res.redirect('/');
+    res.redirect(302, '/');
   });
 };
 

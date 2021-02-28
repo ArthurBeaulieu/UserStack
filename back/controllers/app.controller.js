@@ -24,11 +24,11 @@ exports.homepageTemplate = (req, res) => {
         isAdmin: isAdminUser
       });
     }).catch(opts => {
-      const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
-      res.redirect(responseObject.status, '/');
+      global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+      res.redirect(302, '/');
     });
   }).catch(opts => {
-    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
-    res.redirect(responseObject.status, '/');
+    global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.redirect(302, '/');
   });
 };

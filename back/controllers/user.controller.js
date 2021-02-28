@@ -105,8 +105,8 @@ exports.profileEditTemplate = (req, res) => {
       email: user.email,
     });
   }).catch(opts => {
-    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
-    res.status(responseObject.status).send(responseObject);
+    global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.redirect(302, '/');
   });
 };
 
