@@ -4,7 +4,7 @@ const db = require('../models');
 const Role = db.role;
 
 
-exports.find = opts => {
+exports.get = opts => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
     const rejection = (roleFindErr, role) => {
@@ -24,6 +24,18 @@ exports.find = opts => {
         rejection(roleFindErr, role);
         resolve(role);
       });
+    } else if (opts.filter) {
+      if (opts.multiple) {
+        Role.find(opts.filter, (roleFindErr, roles) => {
+          rejection(roleFindErr, roles);
+          resolve(roles);
+        });
+      } else {
+        Role.findOne(opts.filter, (roleFindErr, role) => {
+          rejection(roleFindErr, role);
+          resolve(role);
+        });
+      }
     }
   });
 };

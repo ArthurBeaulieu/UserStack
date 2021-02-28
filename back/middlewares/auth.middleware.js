@@ -1,13 +1,11 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config.js');
-const db = require('../models');
+const UserHelper = require('../helpers/user.helper');
+const RoleHelper = require('../helpers/role.helper');
 
 
-const User = db.user;
-const Role = db.role;
-
-
-verifyToken = (req, res, next) => {
+// Check token validity from request's cookies to allow access
+isLoggedIn = (req, res, next) => {
   global.Logger.info('Request a token validation');
   // Extract token from session cookies
   let token = req.cookies.jwtToken;
@@ -19,160 +17,111 @@ verifyToken = (req, res, next) => {
   // Check token with jwt token module
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      global.Logger.error('Access refused, the token is either invalid or expired');
+      global.Logger.error('Access refused, the token is either invalid or expired. Redirecting to /login');
       res.redirect('/login');
       return;
     }
+    // Access granted, call next to exist middleware
     global.Logger.info(`Token validated, access granted for user with id ${decoded.id}`);
-    req.userId = decoded.id;
+    req.userId = decoded.id; // Attach user id to the request before any further treatment
     next();
   });
 };
 
 
+// Check database to grant or not access if user has admin role
 isAdmin = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) {
-      res.status(500).send({ message: err });
-      return;
-    }
-    // TODO test if !user
-    Role.find(
-      {
-        _id: { $in: user.roles }
-      },
-      (err, roles) => {
-        if (err) {
-          res.status(500).send({ message: err });
+  global.Logger.info('Request an admin check on user');
+  UserHelper.get({ id: req.userId }).then(user => {
+    RoleHelper.get({ filter: { _id: { $in: user.roles } }, multiple: true }).then(roles => {
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i].name === 'admin') {
+          global.Logger.info('User has the admin role, access granted');
+          next();
           return;
         }
-
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === 'admin') {
-            next();
-            return;
-          }
-        }
-
-        res.status(403).send({ message: 'Require Admin Role!' });
       }
-    );
+      global.Logger.info('User does not have the admin role, access refused');
+      res.redirect('/');
+    }).catch(opts => {
+      global.Logger.logFromCode(opts.code, opts.err);
+      res.redirect('/');
+    });
+  }).catch(opts => {
+    global.Logger.logFromCode(opts.code, opts.err);
+    res.redirect('/');
   });
 };
 
 
-isModerator = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) {
-      res.status(500).send({ message: err });
-      return;
-    }
-
-    Role.find(
-      {
-        _id: { $in: user.roles }
-      },
-      (err, roles) => {
-        if (err) {
-          res.status(500).send({ message: err });
-          return;
-        }
-
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === 'moderator') {
-            next();
-            return;
-          }
-        }
-
-        res.status(403).send({ message: 'Require Moderator Role!' });
-        return;
-      }
-    );
-  });
-};
-
-
+// Check if username/email are already taken in database, for API POST requests
 checkDuplicateUsernameOrEmail = (req, res, next) => {
-  global.Logger.info('Check existing username or mail in database for new registration');
+  global.Logger.info('Check existing username or mail in database');
   // Avoid to send status twice to frontend
   let responseSent = false;
   const promises = [];
   // Username testing promise
   promises.push(new Promise((resolve, reject) => {
-    User.findOne({
-      username: req.body.username
-    }).exec((err, user) => {
-      if (err) {
+    UserHelper.get({ filter: { username: req.body.username } }).then(user => {
+      global.Logger.warn('Requested username is already taken in database');
+      if (responseSent === false) {
+        responseSent = true;
+        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_USERNAME', {}, user.username);
+        res.status(responseObject.status).send(responseObject);
+      }
+      reject();
+    }).catch(opts => {
+      if (opts.err) {
         global.Logger.error('Unable to access the User collection for username');
         if (responseSent === false) {
           responseSent = true;
-          res.status(500).send({ message: err });
+          const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+          res.status(responseObject.status).send(responseObject);
         }
         reject();
-      }
-      // Found a matching user for username ; it's already taken
-      if (user) {
-        global.Logger.warn('Requested username is already taken in database');
-        if (responseSent === false) {
-          responseSent = true;
-          res.status(409).send({
-            status: 409,
-            code: 'B_REGISTER_EXISTING_USERNAME',
-            message: 'This username is already taken. Please choose another one.'
-          });
-        }
-        reject();
-      } else if (req.body.username !== '') {
+      } else if (opts.code === 'B_USER_NOT_FOUND' && req.body.username !== '') {
         global.Logger.info('Requested username is available in database');
+        resolve();
       }
-      resolve();
     });
   }));
   // Email testing promise
   promises.push(new Promise((resolve, reject) => {
-    User.findOne({
-      email: req.body.email
-    }).exec((err, user) => {
-      if (err) {
+    UserHelper.get({ filter: { email: req.body.email } }).then(user => {
+      global.Logger.warn('Requested email is already taken in database');
+      if (responseSent === false) {
+        responseSent = true;
+        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_EMAIL', {}, user.username);
+        res.status(responseObject.status).send(responseObject);
+      }
+      reject();
+    }).catch(opts => {
+      if (opts.err) {
         global.Logger.error('Unable to access the User collection for email');
         if (responseSent === false) {
           responseSent = true;
-          res.status(500).send({ message: err });
+          const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+          res.status(responseObject.status).send(responseObject);
         }
         reject();
+      } else if (opts.code === 'B_USER_NOT_FOUND' && req.body.username !== '') {
+        global.Logger.info('Requested username is available in database');
+        resolve();
       }
-      // Found a matching user for email ; it's already taken
-      if (user) {
-        global.Logger.warn('Requested email is already taken in database');
-        if (responseSent === false) {
-          responseSent = true;
-          res.status(409).send({
-            status: 409,
-            code: 'B_REGISTER_EXISTING_EMAIL',
-            message: 'This email is already in use. Please choose another one.'
-          });
-        }
-        reject();
-      } else if (req.body.email !== '') {
-        global.Logger.info('Requested email is available in database');
-      }
-      resolve();
     });
   }));
-  // Middleware resolution
+  // Continue when all promises are resolved
   Promise.all(promises).then(() => {
-    global.Logger.info('Username and email are not taken in database, continue registration process');
+    global.Logger.info('Username and email are not taken in database');
     next();
   }).catch(() => {
-    global.Logger.warn('Cancel registration process as requested username or mail is already taken');
+    global.Logger.warn('Requested username or mail is already taken');
   });
 };
 
 
 module.exports = {
-  verifyToken,
+  isLoggedIn,
   isAdmin,
-  isModerator,
   checkDuplicateUsernameOrEmail
 };

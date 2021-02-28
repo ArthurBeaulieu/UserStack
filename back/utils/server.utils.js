@@ -42,17 +42,6 @@ exports.initSequence = () => {
             });
           }));
           rolePromises.push(new Promise((resolve, reject) => {
-            new Role({ name: 'moderator' }).save(roleSaveErr => {
-              if (roleSaveErr) {
-                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
-                reject();
-              } else {
-                global.Logger.info('Moderator role has been added to the roles collection');
-                resolve();
-              }
-            });
-          }));
-          rolePromises.push(new Promise((resolve, reject) => {
             new Role({ name: 'admin' }).save(roleSaveErr => {
               if (roleSaveErr) {
                 global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);

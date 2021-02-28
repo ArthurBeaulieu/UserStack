@@ -4,5 +4,5 @@ const controller = require('../controllers/app.controller');
 
 module.exports = app => {
   app.get('/', controller.publicHomepageTemplate);
-  app.get('/home', [authMiddleware.verifyToken], controller.homepageTemplate);
+  app.get('/home', [authMiddleware.isLoggedIn], controller.homepageTemplate);
 };

@@ -2,13 +2,14 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
 
 
 const User = db.user;
-const Role = db.role;
 
 
+// Check sent password and compare with matching user to authorize login or not
 const finalizeLogin = opts => {
   // Password not matching the user
   if (!bcrypt.compareSync(opts.form.password, opts.user.password)) {
@@ -35,13 +36,14 @@ const finalizeLogin = opts => {
 };
 
 
+// Confirm registration and save new user in database
 const finalizeRegistration = opts => {
   if (opts.firstAccount && opts.form.code !== config.adminCode) {
     const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_CODE');
     opts.res.status(responseObject.status).send(responseObject);
     return;
   }
-  // Search for existing parent
+  // Search for existing parent, can't use helper because of specific register handling
   User.findOne({ code: opts.form.code }, (userFindErr, godfather) => {
     // Internal server error when trying to retrieve user from database
     if (userFindErr) {
@@ -69,13 +71,7 @@ const finalizeRegistration = opts => {
       }
     }
     // Retrieve roles from model
-    Role.find({ name: ['user', 'admin'] }, (roleFindErr, roles) => {
-      // Internal server error when trying to retrieve role from database
-      if (roleFindErr) {
-        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_ROLE_FIND', {}, roleFindErr);
-        opts.res.status(responseObject.status).send(responseObject);
-        return;
-      }
+    RoleHelper.get({ filter: { name: ['user', 'admin'] } }).then(roles => {
       // Create dates for user
       opts.user.registration = new Date();
       opts.user.lastlogin = new Date();
@@ -127,6 +123,9 @@ const finalizeRegistration = opts => {
         const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
         opts.res.status(responseObject.status).send(responseObject);
       });
+    }).catch(args => {
+      const responseObject = global.Logger.buildResponseFromCode(args.code, {}, args.err);
+      opts.res.status(responseObject.status).send(responseObject);
     });
   });
 };
@@ -135,12 +134,14 @@ const finalizeRegistration = opts => {
 /* Exported methods */
 
 
+// Public /login template
 exports.loginTemplate = (req, res) => {
   global.Logger.info('Rendering template for the /login page');
   res.render('partials/auth/login', { layout: 'auth' });
 };
 
 
+// Login client submission
 exports.loginPost = (req, res) => {
   global.Logger.info('Request POST API call on /api/auth/login');
   const form = req.body;
@@ -208,12 +209,14 @@ exports.loginPost = (req, res) => {
 };
 
 
+// Public /register template
 exports.registerTemplate = (req, res) => {
   global.Logger.info('Rendering template for the /register page');
   res.render('partials/auth/register', { layout: 'auth' });
 };
 
 
+// Register client submission
 exports.registerPost = (req, res) => {
   global.Logger.info('Request POST API call on /api/auth/register');
   const form = req.body;
@@ -275,8 +278,9 @@ exports.registerPost = (req, res) => {
 };
 
 
+// Logout redirection url -> clear cookies and redirect to public homepage
 exports.logout = (req, res) => {
   global.Logger.info('Request /logout action');
   res.clearCookie('jwtToken');
-  res.redirect(302, '/login');
+  res.redirect(302, '/');
 };

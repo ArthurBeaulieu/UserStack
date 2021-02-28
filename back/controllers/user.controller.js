@@ -12,7 +12,7 @@ const Role = db.role;
 
 const connectChildrenToGodfather = (godfather, userId) => {
   // Find matching user for token ID
-  UserHelper.find({ id: userId }).then(user => {
+  UserHelper.get({ id: userId }).then(user => {
     godfather.children.push(user._id);
     user.parent = godfather._id;
     --user.depth; // Decrement user depth to match its previous parent one
@@ -97,7 +97,7 @@ exports.profileTemplate = (req, res) => {
 exports.profileEditTemplate = (req, res) => {
   global.Logger.info('Request template for the /profile/edit page');
   // Find matching user for token ID
-  UserHelper.find({ id: req.userId }).then(user => {
+  UserHelper.get({ id: req.userId }).then(user => {
     global.Logger.info('Rendering template for the /profile/edit page');
     res.render('partials/user/edit', {
       layout: 'user',
@@ -120,7 +120,7 @@ exports.updateInfo = (req, res) => {
     return;
   }
   // Find matching user for token ID
-  UserHelper.find({ id: req.userId }).then(user => {
+  UserHelper.get({ id: req.userId }).then(user => {
     // Ensure fields contains changes
     if (user.username === form.username && user.email === form.email) {
       const responseObject = global.Logger.buildResponseFromCode('B_PROFILE_UPDATE_INFO_NO_CHANGES');
@@ -136,7 +136,7 @@ exports.updateInfo = (req, res) => {
     // Enclosed method to check if user exists (from username or email). If not, saving new one to user
     const findUser = opts => {
       return new Promise((resolve, reject) => {
-        UserHelper.find({ filter: opts.filter }).then(matchingUser => {
+        UserHelper.get({ filter: opts.filter }).then(matchingUser => {
           if (matchingUser) {
             taken[opts.type] = true;
             resolve();
@@ -209,9 +209,9 @@ exports.updateRole = (req, res) => {
     return;
   }
   // Find matching user for token ID
-  UserHelper.find({ id: req.body.userId }).then(user => {
+  UserHelper.get({ id: req.body.userId }).then(user => {
     UserHelper.isAdminUser(user).then(isAdmin => {
-      RoleHelper.find({ id: form.roleId }).then(role => {
+      RoleHelper.get({ id: form.roleId }).then(role => {
         if (form.checked === true) {
           user.roles.push(form.roleId);
         } else {
@@ -295,7 +295,7 @@ exports.updatePassword = (req, res) => {
     return;
   }
   // Find matching user for token ID
-  UserHelper.find({ id: req.userId }).then(user => {
+  UserHelper.get({ id: req.userId }).then(user => {
     // Password not matching the user
     if (!bcrypt.compareSync(form.pass1, user.password)) {
       const responseObject = global.Logger.buildResponseFromCode('B_PROFILE_UPDATE_PASSWORD_INVALID_PASSWORD');
@@ -330,9 +330,9 @@ exports.delete = (req, res) => {
     id = req.body.userId;
   }
   // Find matching user for token ID
-  UserHelper.find({ id: id }).then(user => {
+  UserHelper.get({ id: id }).then(user => {
     if (user.parent) {
-      UserHelper.find({ id: user.parent }).then(godfather => {
+      UserHelper.get({ id: user.parent }).then(godfather => {
         // Remove user id from godfather children array
         const index = godfather.children.indexOf(id);
         if (index > -1) {

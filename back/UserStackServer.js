@@ -84,7 +84,7 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
       global.Logger.info('Gracefully stopping UserStack server');
       process.exit();
     });
-  }).catch(() => {
+  }).catch(err => {
     global.Logger.error(`Unable to update database model : ${err}`);
     global.Logger.error('Gracefully stopping UserStack server');
     process.exit();

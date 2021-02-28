@@ -1,13 +1,10 @@
-const db = require('../models');
 const UserHelper = require('../helpers/user.helper');
 
 
-const User = db.user;
-
-
+// Public / template
 exports.publicHomepageTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the / page');
   UserHelper.isLoggedIn(req).then(isLoggedIn => {
+    global.Logger.info('Rendering template for the / page');
     res.render('partials/index/main', {
       layout : 'index',
       isLoggedIn: isLoggedIn
@@ -16,16 +13,22 @@ exports.publicHomepageTemplate = (req, res) => {
 };
 
 
+// Private /home template (for authenticated users)
 exports.homepageTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the /home page');
-  User.findById(req.userId, (userFindErr, user) => {
+  global.Logger.info('Request template for the /home page');
+  UserHelper.get({ id: req.userId }).then(user => {
     UserHelper.isAdminUser(user).then(isAdminUser => {
+      global.Logger.info('Rendering template for the /home page');
       res.render('partials/home/main', {
         layout : 'home',
         isAdmin: isAdminUser
       });
-    }).catch(() => {
-      res.redirect(302, '/');
+    }).catch(opts => {
+      const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+      res.redirect(responseObject.status, '/');
     });
+  }).catch(opts => {
+    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.redirect(responseObject.status, '/');
   });
 };

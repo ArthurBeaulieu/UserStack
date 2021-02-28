@@ -49,6 +49,16 @@
     "status": 400,
     "log": "The provided invitation code is invalid or expired"
   },
+  "B_REGISTER_EXISTING_USERNAME": {
+    "type": "info",
+    "status": 409,
+    "log": "This username is already taken in database"
+  },
+  "B_REGISTER_EXISTING_EMAIL": {
+    "type": "info",
+    "status": 409,
+    "log": "This email is already taken in database"
+  },
   "B_REGISTER_SUCCESS": {
     "type": "info",
     "status": 200,

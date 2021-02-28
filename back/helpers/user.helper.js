@@ -7,7 +7,7 @@ const User = db.user;
 const Role = db.role;
 
 
-exports.find = opts => {
+exports.get = opts => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
     const rejection = (userFindErr, user) => {
@@ -28,10 +28,17 @@ exports.find = opts => {
         resolve(user);
       });
     } else if (opts.filter) {
-        User.findOne(opts.filter).exec((userFindErr, user) => {
-        rejection(userFindErr, user);
-        resolve(user);
-      });
+      if (opts.multiple) {
+        User.find(opts.filter, (userFindErr, users) => {
+          rejection(userFindErr, users);
+          resolve(users);
+        });
+      } else {
+        User.findOne(opts.filter, (userFindErr, user) => {
+          rejection(userFindErr, user);
+          resolve(user);
+        });
+      }
     }
   });
 };

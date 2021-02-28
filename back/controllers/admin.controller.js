@@ -1,34 +1,26 @@
-const db = require('../models');
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
-const Utils = require('../utils/server.utils');
+const utils = require('../utils/server.utils');
 
 
-const User = db.user;
-const Role = db.role;
-
-
-/* Exports */
-
-
+// Private /admin template (for authenticated admin users)
 exports.adminTemplate = (req, res) => {
   global.Logger.info('Rendering template for the /admin page');
   res.render('partials/admin/menu', { layout : 'admin' });
 };
 
 
+// Private /admin/users template (for authenticated admin users)
 exports.adminUsersTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the /admin/users page');
-
+  global.Logger.info('Request template for the /admin/users page');
+  // Internal variables for template
   const promises = [];
   const usersFormatted = [];
-
   promises.push(new Promise(resolve => {
     UserHelper.getAll().then(users => {
       RoleHelper.getAll().then(roles => {
         for (let i = 0; i < users.length; ++i) {
           let userRoles = [];
-
           for (let j = 0; j < roles.length; ++j) {
             userRoles.push({
               id: roles[j]._id,
@@ -36,35 +28,35 @@ exports.adminUsersTemplate = (req, res) => {
               checked: (users[i].roles.indexOf(roles[j]._id) !== -1)
             });
           }
-
+          // Create template user
           const user = {
             id: users[i]._id,
             username: users[i].username,
             email: users[i].email,
-            registration: Utils.formatDate(users[i].registration),
+            registration: utils.formatDate(users[i].registration),
             godfather: null,
             children: [],
             roles: userRoles
           };
-
+          // Attach godfather to user
           promises.push(new Promise(resolve => {
-            User.findById(users[i].parent, (godfatherFindErr, godfather) => {
-              if (godfather) {
-                user.godfather = godfather.username;
-              }
+            UserHelper.get({ id: users[i].parent }).then(godfather => {
+              user.godfather = godfather.username;
+            }).finally(() => {
               resolve();
             });
           }));
-
+          // Attach children to user
           promises.push(new Promise(resolve => {
-            User.find({ _id: { $in: users[i].children } }, (childrenFindErr, children) => {
+            UserHelper.get({ filter: { _id: { $in: users[i].children } }, multiple: true }).then(children => {
               for (let j = 0; j < children.length; ++j) {
                 user.children.push(children[j].username);
               }
+            }).finally(() => {
               resolve();
             });
           }));
-
+          // Save user with template formatting
           usersFormatted.push(user);
         }
       }).catch(err => {
@@ -75,8 +67,9 @@ exports.adminUsersTemplate = (req, res) => {
     });
     resolve();
   }));
-
+  // On all promises resolution, render template
   Promise.all(promises).then(() => {
+    global.Logger.info('Rendering template for the /admin/users page');
     res.render('partials/admin/users', {
       layout : 'admin',
       users: usersFormatted
