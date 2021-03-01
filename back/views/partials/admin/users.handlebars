@@ -1,4 +1,7 @@
 <h1>App roles</h1>
+<div>
+  <p id="error-output"></p>
+</div>
 <ul id="roles-list"></ul>
 <h1>Registered users</h1>
 <ul id="users-list">
@@ -7,7 +10,9 @@
       <p>Username : {{username}}</p>
       <p>Email : <a href="mailto:{{this.email}}">{{this.email}}</a></p>
       <p>Registration : {{this.registration}}</p>
+      <p>Last login : {{this.lastLogin}}</p>
       <p>Godfather : {{this.godfather}}</p>
+      <p>Depth from Root account : {{this.depth}}</p>
       <p>Children : {{#each this.children}}
         <span>{{this}}</span>
       {{/each}}</p>

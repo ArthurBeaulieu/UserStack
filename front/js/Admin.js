@@ -5,6 +5,8 @@ const kom = new Kom();
 const rolesList = document.querySelector('#roles-list');
 const usersList = document.querySelector('#users-list');
 if (rolesList && usersList) {
+  const error = document.querySelector('#error-output');
+
   for (let i = 0; i < usersList.children.length; ++i) {
     const roles = usersList.children[i].querySelector('.user-roles');
 
@@ -32,6 +34,8 @@ if (rolesList && usersList) {
       const processResponse = res => {
         if (res.status === 200) {
           window.location = '/admin/users';
+        } else if (res.code === 'B_NEVER_KILL_ROOT') {
+          error.innerHTML = res.message;
         }
       };
 

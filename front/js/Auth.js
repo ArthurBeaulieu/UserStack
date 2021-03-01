@@ -54,7 +54,22 @@ if (registerSubmit) {
       // Handle backend errors
       dom.error.classList.add('error');
       dom.error.innerHTML = res.message;
-      if (res.code === 'B_REGISTER_EXISTING_USERNAME') {
+      if (res.code === 'B_INVALID_FIELD') {
+        dom.username.classList.add('error');
+        dom.email.classList.add('error');
+      } else if (res.code === 'B_MISSING_FIELD') {
+        dom.username.classList.add('error');
+        dom.email.classList.add('error');
+      } else if (res.code === 'B_REGISTER_INVALID_FIELD') {
+        dom.username.classList.add('error');
+        dom.email.classList.add('error');
+        dom.code.classList.add('error');
+        dom.pass1.classList.add('error');
+        dom.pass2.classList.add('error');
+      } else if (res.code === 'B_REGISTER_EXISTING_USERNAME_AND_EMAIL') {
+        dom.username.classList.add('error');
+        dom.email.classList.add('error');
+      } else if (res.code === 'B_REGISTER_EXISTING_USERNAME') {
         dom.username.classList.add('error');
       } else if (res.code === 'B_REGISTER_EXISTING_EMAIL') {
         dom.email.classList.add('error');
@@ -109,7 +124,10 @@ if (loginSubmit) {
       // Handle backend errors
       dom.error.classList.add('error');
       dom.error.innerHTML = res.message;
-      if (res.code === 'B_LOGIN_MISSING_FIELD') {
+      if (res.code === 'B_LOGIN_INVALID_FIELD') {
+        dom.username.classList.add('error');
+        dom.password.classList.add('error');
+      } else if (res.code === 'B_LOGIN_MISSING_FIELD') {
         if (res.missing.username) { dom.username.classList.add('error'); }
         if (res.missing.password) { dom.password.classList.add('error'); }
       } else if (res.code === 'B_LOGIN_USER_NOT_FOUND') {

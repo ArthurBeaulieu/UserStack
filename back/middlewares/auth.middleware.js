@@ -6,7 +6,7 @@ const RoleHelper = require('../helpers/role.helper');
 
 // Check token validity from request's cookies to allow access
 isLoggedIn = (req, res, next) => {
-  global.Logger.info('Request a token validation');
+  global.Logger.info(`Request a token validation for url ${req.originalUrl}`);
   // Extract token from session cookies
   let token = req.cookies.jwtToken;
   if (!token) {
@@ -31,7 +31,7 @@ isLoggedIn = (req, res, next) => {
 
 // Check database to grant or not access if user has admin role
 isAdmin = (req, res, next) => {
-  global.Logger.info('Request an admin check on user');
+  global.Logger.info(`Request an admin check on user for url ${req.originalUrl}`);
   UserHelper.get({ id: req.userId }).then(user => {
     RoleHelper.get({ filter: { _id: { $in: user.roles } }, multiple: true }).then(roles => {
       for (let i = 0; i < roles.length; i++) {
@@ -41,7 +41,7 @@ isAdmin = (req, res, next) => {
           return;
         }
       }
-      global.Logger.info('User does not have the admin role, access refused');
+      global.Logger.info('User does not have the admin role, access refused. Redirecting to /');
       res.redirect(302, '/');
     }).catch(opts => {
       global.Logger.logFromCode(opts.code, opts.err);
@@ -56,66 +56,71 @@ isAdmin = (req, res, next) => {
 
 // Check if username/email are already taken in database, for API POST requests
 checkDuplicateUsernameOrEmail = (req, res, next) => {
-  global.Logger.info('Check existing username or mail in database');
+  global.Logger.info('Check existing username and mail in database');
+  const form = req.body;
+  if (form.username === undefined || form.email === undefined) {
+    const responseObject = global.Logger.buildResponseFromCode('B_INVALID_FIELD');
+    res.status(responseObject.status).send(responseObject);
+    return;
+  }
+
+  if (form.username === '' || form.email === '') {
+    const responseObject = global.Logger.buildResponseFromCode('B_MISSING_FIELD');
+    res.status(responseObject.status).send(responseObject);
+    return;
+  }
   // Avoid to send status twice to frontend
-  let responseSent = false;
+  let usernameTaken = false;
+  let emailTaken = false;
   const promises = [];
   // Username testing promise
   promises.push(new Promise((resolve, reject) => {
-    UserHelper.get({ filter: { username: req.body.username } }).then(user => {
-      global.Logger.warn('Requested username is already taken in database');
-      if (responseSent === false) {
-        responseSent = true;
-        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_USERNAME', {}, user.username);
-        res.status(responseObject.status).send(responseObject);
-      }
-      reject();
-    }).catch(opts => {
-      if (opts.err) {
-        global.Logger.error('Unable to access the User collection for username');
-        if (responseSent === false) {
-          responseSent = true;
-          const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
-          res.status(responseObject.status).send(responseObject);
-        }
-        reject();
-      } else if (opts.code === 'B_USER_NOT_FOUND' && req.body.username !== '') {
+    UserHelper.get({ filter: { username: form.username }, empty: true }).then(user => {
+      if (!user) {
         global.Logger.info('Requested username is available in database');
-        resolve();
+      } else {
+        // User exists, reject username submission
+        global.Logger.warn('Requested username is already taken in database');
+        usernameTaken = true;
       }
+      resolve();
+    }).catch(opts => {
+      reject(opts);
     });
   }));
   // Email testing promise
   promises.push(new Promise((resolve, reject) => {
-    UserHelper.get({ filter: { email: req.body.email } }).then(user => {
-      global.Logger.warn('Requested email is already taken in database');
-      if (responseSent === false) {
-        responseSent = true;
-        const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_EMAIL', {}, user.username);
-        res.status(responseObject.status).send(responseObject);
+    UserHelper.get({ filter: { email: form.email }, empty: true }).then(user => {
+      if (!user) {
+        global.Logger.info('Requested email is available in database');
+      } else {
+        // User exists, reject email submission
+        global.Logger.warn('Requested email is already taken in database');
+        emailTaken = true;
       }
-      reject();
+      resolve();
     }).catch(opts => {
-      if (opts.err) {
-        global.Logger.error('Unable to access the User collection for email');
-        if (responseSent === false) {
-          responseSent = true;
-          const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
-          res.status(responseObject.status).send(responseObject);
-        }
-        reject();
-      } else if (opts.code === 'B_USER_NOT_FOUND' && req.body.username !== '') {
-        global.Logger.info('Requested username is available in database');
-        resolve();
-      }
+      reject(opts);
     });
   }));
   // Continue when all promises are resolved
   Promise.all(promises).then(() => {
-    global.Logger.info('Username and email are not taken in database');
-    next();
-  }).catch(() => {
-    global.Logger.warn('Requested username or mail is already taken');
+    if (usernameTaken && emailTaken) {
+      const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_USERNAME_AND_EMAIL');
+      res.status(responseObject.status).send(responseObject);
+    } else if (usernameTaken) {
+      const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_USERNAME');
+      res.status(responseObject.status).send(responseObject);
+    } else if (emailTaken) {
+      const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_EXISTING_EMAIL');
+      res.status(responseObject.status).send(responseObject);
+    } else {
+      global.Logger.info('Username and email are not taken in database');
+      next();
+    }
+  }).catch(opts => {
+    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
   });
 };
 

@@ -28,7 +28,13 @@ if (editProfileInfoSubmit) {
       if (res.taken.username) { dom.username.classList.add('error'); }
       if (res.taken.email) { dom.email.classList.add('error'); }
       if (res.message) { dom.error.innerHTML = res.message; }
-    } else if (res.code === 'B_USER_INFO_NO_CHANGES') {
+    } else if (res.code === 'B_PROFILE_UPDATE_INFO_INVALID_FIELD') {
+      dom.username.classList.add('error');
+      dom.email.classList.add('error');
+    } else if (res.code === 'B_PROFILE_UPDATE_INFO_MISSING_FIELD') {
+      dom.username.classList.add('error');
+      dom.email.classList.add('error');
+    } else if (res.code === 'B_PROFILE_UPDATE_INFO_NO_CHANGES') {
       dom.error.innerHTML = res.message;
     }
   };
@@ -64,22 +70,30 @@ if (editProfilePasswordSubmit) {
       dom.pass3.value = '';
     } else {
       dom.error.classList.add('error');
-      if (res.code === 'B_USER_PASSWORD_NO_CHANGES') {
+      if (res.code === 'B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD') {
         dom.pass1.classList.add('error');
         dom.pass2.classList.add('error');
         dom.pass3.classList.add('error');
-      } else if (res.code === 'B_USER_PASSWORD_MISSING_FIELD') {
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_EMPTY_FIELD') {
+        dom.pass1.classList.add('error');
+        dom.pass2.classList.add('error');
+        dom.pass3.classList.add('error');
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_MISSING_FIELD') {
         if (res.missing.pass1) { dom.pass1.classList.add('error'); }
         if (res.missing.pass2) { dom.pass2.classList.add('error'); }
         if (res.missing.pass3) { dom.pass3.classList.add('error'); }
-      } else if (res.code === 'B_USER_PASSWORD_NOT_VALID') {
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_DIFFERENT_PASSWORDS') {
+        dom.pass2.classList.add('error');
+        dom.pass3.classList.add('error');
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_SAME_PASSWORDS') {
         dom.pass1.classList.add('error');
-      } else if (res.code === 'B_USER_PASSWORD_DIFFERENT_PASSWORDS') {
         dom.pass2.classList.add('error');
         dom.pass3.classList.add('error');
-      } else if (res.code === 'B_USER_PASSWORD_TOO_SHORT') {
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_PASSWORD_TOO_SHORT') {
         dom.pass2.classList.add('error');
         dom.pass3.classList.add('error');
+      } else if (res.code === 'B_PROFILE_UPDATE_PASSWORD_INVALID_PASSWORD') {
+        dom.pass1.classList.add('error');
       }
     }
   };

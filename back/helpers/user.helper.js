@@ -7,6 +7,17 @@ const User = db.user;
 const Role = db.role;
 
 
+exports.new = opts => {
+  return new User({
+    username: opts.username,
+    email: opts.email,
+    code: opts.code,
+    password: opts.password,
+    depth: opts.depth
+  });
+};
+
+
 exports.get = opts => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
@@ -18,7 +29,11 @@ exports.get = opts => {
       }
       // User not found in database
       if (!user) {
-        reject({ code: 'B_USER_NOT_FOUND' });
+        if (opts.empty) {
+          resolve(null);
+        } else {
+          reject({ code: 'B_USER_NOT_FOUND' });
+        }
       }
     };
     // Find user depending on opts type
@@ -32,6 +47,11 @@ exports.get = opts => {
         User.find(opts.filter, (userFindErr, users) => {
           rejection(userFindErr, users);
           resolve(users);
+        });
+      } else if (opts.populate) {
+        User.findOne(opts.filter).populate('roles', '-__v').exec((userFindErr, user) => {
+          rejection(userFindErr, user);
+          resolve(user);
         });
       } else {
         User.findOne(opts.filter, (userFindErr, user) => {
@@ -52,6 +72,45 @@ exports.getAll = () => {
       } else {
         resolve(users);
       }
+    });
+  });
+};
+
+
+exports.count = () => {
+  return new Promise((resolve, reject) => {
+    User.countDocuments({}, (userCountErr, count) => {
+      if (userCountErr) {
+        const err = new Error(userCountErr);
+        reject({ code: 'B_INTERNAL_ERROR_USER_COUNT', err: err.toString() });
+      }
+      resolve(count);
+    });
+  });
+};
+
+
+exports.save = user => {
+  return new Promise((resolve, reject) => {
+    user.save(userSaveErr => {
+      if (userSaveErr) {
+        const err = new Error(userSaveErr);
+        reject({ code: 'B_INTERNAL_ERROR_USER_SAVE', err: err.toString() });
+      }
+      resolve();
+    });
+  });
+};
+
+
+exports.delete = filter => {
+  return new Promise((resolve, reject) => {
+    User.deleteOne(filter,  userDeleteErr => {
+      if (userDeleteErr) {
+        const err = new Error(userDeleteErr);
+        reject({ code: 'B_INTERNAL_ERROR_USER_DELETE', err: err.toString() });
+      }
+      resolve();
     });
   });
 };
@@ -88,13 +147,13 @@ exports.isAdminUser = user => {
         global.Logger.error('Unable to retrieve roles for user');
         reject();
       }
-      console.log(roles, user)
+      // Search for admin role in user's role list
       for (let i = 0; i < roles.length; ++i) {
         if (roles[i].name === 'admin') {
           resolve(true);
         }
       }
-
+      // Resolve as not admin by default
       resolve(false);
     });
   });

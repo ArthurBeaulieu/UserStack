@@ -2,17 +2,12 @@
   "B_LOGIN_INVALID_FIELD": {
     "type": "error",
     "status": 400,
-    "log": "Login POST submission does not contain a username and/or a password"
+    "log": "Login API submission does not contain a username and a password"
   },
   "B_LOGIN_MISSING_FIELD": {
     "type": "warn",
     "status": 400,
     "log": "Login submission has been refused because some fields are not filled"
-  },
-  "B_LOGIN_USER_NOT_FOUND": {
-    "type": "warn",
-    "status": 404,
-    "log": "Login submission has been refused because the provided username or email is not registered"
   },
   "B_LOGIN_INVALID_PASSWORD": {
     "type": "warn",
@@ -27,10 +22,10 @@
   "B_REGISTER_INVALID_FIELD": {
     "type": "error",
     "status": 400,
-    "log": "Register POST submission does not contain a mandatory field in username, email, code, pass1 and pass2"
+    "log": "Register API submission does not contain a mandatory field in username, email, code, pass1 and pass2"
   },
   "B_REGISTER_MISSING_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "Register submission has been refused because some fields are not filled"
   },
@@ -49,13 +44,18 @@
     "status": 400,
     "log": "The provided invitation code is invalid or expired"
   },
+  "B_REGISTER_EXISTING_USERNAME_AND_EMAIL": {
+    "type": "warn",
+    "status": 409,
+    "log": "Both username and email are taken in database"
+  },
   "B_REGISTER_EXISTING_USERNAME": {
-    "type": "info",
+    "type": "warn",
     "status": 409,
     "log": "This username is already taken in database"
   },
   "B_REGISTER_EXISTING_EMAIL": {
-    "type": "info",
+    "type": "warn",
     "status": 409,
     "log": "This email is already taken in database"
   },
@@ -65,17 +65,17 @@
     "log": "Register submission successful for"
   },
   "B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "Change password POST submission does not contain a mandatory field in pass1, pass2 and pass3"
   },
   "B_PROFILE_UPDATE_PASSWORD_EMPTY_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "No password modification were sent, all fields are empty"
   },
   "B_PROFILE_UPDATE_PASSWORD_MISSING_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "Some password fields are empty"
   },
@@ -105,9 +105,14 @@
     "log": "Password successfully updated"
   },
   "B_PROFILE_UPDATE_ROLE_INVALID_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "Update role POST submission does not contain a mandatory field in userId, roleId or checked"
+  },
+  "B_PROFILE_UPDATE_ROLE_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Missing user ID or role ID to update"
   },
   "B_PROFILE_UPDATE_ROLE_CANT_REMOVE_ADMIN_FROM_ROOT": {
     "type": "warn",
@@ -117,12 +122,17 @@
   "B_PROFILE_UPDATE_ROLE_SUCCESS": {
     "type": "info",
     "status": 200,
-    "log": "Role successfully updated"
+    "log": "Role successfully updated for"
   },
   "B_PROFILE_UPDATE_INFO_INVALID_FIELD": {
-    "type": "warn",
+    "type": "error",
     "status": 400,
     "log": "Data sent to the server does not contain a mandatory field in username and email"
+  },
+  "B_PROFILE_UPDATE_INFO_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "Missing username or email to update"
   },
   "B_PROFILE_UPDATE_INFO_NO_CHANGES": {
     "type": "warn",
@@ -140,17 +150,27 @@
     "log": "User successfully deleted from database"
   },
   "B_USER_NOT_FOUND": {
-    "type": "info",
+    "type": "warn",
     "status": 404,
     "log": "Can not find user in database"
   },
   "B_ROLE_NOT_FOUND": {
-    "type": "info",
+    "type": "warn",
     "status": 404,
     "log": "Can not find role in database"
   },
+  "B_INVALID_FIELD": {
+    "type": "error",
+    "status": 400,
+    "log": "Provided form data is not matching the expected structure"
+  },
+  "B_MISSING_FIELD": {
+    "type": "warn",
+    "status": 400,
+    "log": "API submission does not contain a mandatory field"
+  },
   "B_NEVER_KILL_ROOT": {
-    "type": "info",
+    "type": "warn",
     "status": 403,
     "log": "Deleting root account is not permitted"
   },

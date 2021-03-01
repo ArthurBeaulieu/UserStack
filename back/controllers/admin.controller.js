@@ -1,6 +1,7 @@
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
+//TODO allow/forbid registration saved to config?
 
 
 // Private /admin template (for authenticated admin users)
@@ -34,7 +35,9 @@ exports.adminUsersTemplate = (req, res) => {
             username: users[i].username,
             email: users[i].email,
             registration: utils.formatDate(users[i].registration),
+            lastLogin: utils.formatDate(users[i].lastlogin),
             godfather: null,
+            depth: users[i].depth,
             children: [],
             roles: userRoles
           };

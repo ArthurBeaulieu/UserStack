@@ -1,56 +1,46 @@
 const config = require('../config/auth.config');
-const db = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
 
 
-const User = db.user;
-
-
 // Check sent password and compare with matching user to authorize login or not
-const finalizeLogin = opts => {
+const _finalizeLogin = opts => {
   // Password not matching the user
   if (!bcrypt.compareSync(opts.form.password, opts.user.password)) {
-    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_PASSWORD', {}, opts.user.username);
+    const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_PASSWORD', {}, opts.form.username);
     opts.res.status(responseObject.status).send(responseObject);
     return;
   }
   // Update user last login and save it to the database
   opts.user.lastlogin = new Date();
-  opts.user.save(userSaveErr => {
-    if (userSaveErr) {
-      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
-      opts.res.status(responseObject.status).send(responseObject);
-      return;
-    }
-    // Only create token for user if save was successful
-    const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: 86400 });
-    // Cookie expires in one day for session
-    opts.res.cookie('jwtToken', token, { maxAge: 8640000, httpOnly: true });
+  global.Logger.info(`Saving new last login for ${opts.form.username} in database`);
+  UserHelper.save(opts.user).then(() => {
+    // Only create token for user if save was successful for a given duration
+    const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: config.tokenValidity });
+    // Set cookie with expiration for session according to auth config (must be in ms, so x1000)
+    opts.res.cookie('jwtToken', token, { maxAge: (config.tokenValidity * 1000), httpOnly: true });
     // Send proper redirection after login
     const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_SUCCESS', { url: '/home' }, opts.user.username);
+    opts.res.status(responseObject.status).send(responseObject);
+  }).catch(args => {
+    const responseObject = global.Logger.buildResponseFromCode(args.code, {}, args.err);
     opts.res.status(responseObject.status).send(responseObject);
   });
 };
 
 
 // Confirm registration and save new user in database
-const finalizeRegistration = opts => {
+const _finalizeRegistration = opts => {
   if (opts.firstAccount && opts.form.code !== config.adminCode) {
     const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_CODE');
     opts.res.status(responseObject.status).send(responseObject);
     return;
   }
-  // Search for existing parent, can't use helper because of specific register handling
-  User.findOne({ code: opts.form.code }, (userFindErr, godfather) => {
-    // Internal server error when trying to retrieve user from database
-    if (userFindErr) {
-      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
-      opts.res.status(responseObject.status).send(responseObject);
-      return;
-    }
+  // Search for existing parent
+  UserHelper.get({ filter: { code: opts.form.code }, empty: true }).then(godfather => {
     // User hierarchy update if not first register on app
     if (!opts.firstAccount) {
       // First account invite code is handle before
@@ -66,11 +56,15 @@ const finalizeRegistration = opts => {
         opts.user.depth = godfather.depth + 1;
         opts.user.parent = godfather._id;
         if (opts.user.depth >= config.maxDepth) {
+          global.Logger.info('New user has reached max depth from root account, revoking its code to invite new user');
           opts.user.code = ''; // Remove invite code if max depth is reached
         }
       }
+    } else {
+      opts.user.parent = opts.user._id;
     }
     // Retrieve roles from model
+    global.Logger.info(`Assign roles to the new user ${opts.user.username}`);
     RoleHelper.get({ filter: { name: ['user', 'admin'] }, multiple: true }).then(roles => {
       // Create dates for user
       opts.user.registration = new Date();
@@ -92,41 +86,34 @@ const finalizeRegistration = opts => {
       // Update godfather with new children and code
       if (godfather) {
         promises.push(new Promise((resolve, reject) => {
-          godfather.save(userSaveErr => {
-            if (userSaveErr) {
-              reject(userSaveErr);
-            } else {
-              resolve();
-            }
-          });
+          global.Logger.info(`Saving user's godfather ${godfather.username} in database`);
+          UserHelper.save(godfather).then(resolve).catch(reject);
         }));
       }
       // Save new user with roles
       promises.push(new Promise((resolve, reject) => {
-        opts.user.save(userSaveErr => {
-          if (userSaveErr) {
-            reject(userSaveErr);
-          } else {
-            resolve();
-          }
-        });
+        global.Logger.info(`Saving new user ${opts.user.username} in database`);
+        UserHelper.save(opts.user).then(resolve).catch(reject);
       }));
       // Redirect client when all saves are OK
       Promise.all(promises).then(() => {
         // Session cookie expires in one day
-        const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: 86400 });
-        opts.res.cookie('jwtToken', token, { maxAge: 8640000, httpOnly: true });
+        const token = jwt.sign({ id: opts.user.id }, config.secret, { expiresIn: config.tokenValidity });
+        opts.res.cookie('jwtToken', token, { maxAge: (config.tokenValidity * 1000), httpOnly: true });
         // Send proper redirection after registration
         const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_SUCCESS', { url: '/home' }, opts.user.username);
         opts.res.status(responseObject.status).send(responseObject);
-      }).catch(userSaveErr => {
-        const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_SAVE', {}, userSaveErr);
+      }).catch(args => {
+        const responseObject = global.Logger.buildResponseFromCode(args.code, {}, args.err);
         opts.res.status(responseObject.status).send(responseObject);
       });
     }).catch(args => {
       const responseObject = global.Logger.buildResponseFromCode(args.code, {}, args.err);
       opts.res.status(responseObject.status).send(responseObject);
     });
+  }).catch(args => {
+    const responseObject = global.Logger.buildResponseFromCode(args.code, {}, args.err);
+    opts.res.status(responseObject.status).send(responseObject);
   });
 };
 
@@ -143,10 +130,10 @@ exports.loginTemplate = (req, res) => {
 
 // Login client submission
 exports.loginPost = (req, res) => {
-  global.Logger.info('Request POST API call on /api/auth/login');
+  global.Logger.info(`Request ${req.method} API call on /api/auth/login`);
   const form = req.body;
   // Prevent wrong arguments sent to POST
-  if (!form.username || !form.password) {
+  if (form.username === undefined || form.password === undefined) {
     const responseObject = global.Logger.buildResponseFromCode('B_LOGIN_INVALID_FIELD');
     res.status(responseObject.status).send(responseObject);
     return;
@@ -163,48 +150,37 @@ exports.loginPost = (req, res) => {
     return;
   }
   // Search username/email in database then test password matching
-  User.findOne({ username: form.username }).populate('roles', '-__v').exec((userFindErr, user) => {
-    // Internal server error when trying to retrieve user from database
-    if (userFindErr) {
-      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
-      res.status(responseObject.status).send(responseObject);
-      return;
-    }
+  global.Logger.info(`Form data is valid, now searching for ${form.username} by username in database`);
+  UserHelper.get({ filter: { username: form.username }, populate: true, empty: true }).then(user => {
     // Not found by username, try to find user in database by email
     if (!user) {
-      global.Logger.info('Did not found a username in database matching the sent login form. Searching for matching email');
-      User.findOne({ email: form.username }).populate('roles', '-__v').exec((userFindErr, user) => {
-        // Internal server error when trying to retrieve user from database
-        if (userFindErr) {
-          const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_FIND', {}, userFindErr);
-          res.status(responseObject.status).send(responseObject);
-          return;
-        }
-        // User not found either with username or email
-        if (!user) {
-          const responseObject = global.Logger.buildResponseFromCode('B_USER_NOT_FOUND');
-          res.status(responseObject.status).send(responseObject);
-          return;
-        }
+      global.Logger.info(`Username not found. Searching for ${form.username} by email in database`);
+      UserHelper.get({ filter: { email: form.username }, populate: true }).then(user => {
         // User has been found by email, check its password validity
-        global.Logger.info('Found an email in database matching the sent login form');
-        finalizeLogin({
+        global.Logger.info(`${form.username} found by email in database`);
+        _finalizeLogin({
           req: req,
           res: res,
           user: user,
           form: form,
         });
-      })
+      }).catch(opts => {
+        const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+        res.status(responseObject.status).send(responseObject);
+      });
     } else {
       // User has been found by username, check its password validity
-      global.Logger.info('Found a username in database matching the sent login form');
-      finalizeLogin({
+      global.Logger.info(`${form.username} found by username in database`);
+      _finalizeLogin({
         req: req,
         res: res,
         user: user,
         form: form,
       });
     }
+  }).catch(opts => {
+    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
   });
 };
 
@@ -218,10 +194,10 @@ exports.registerTemplate = (req, res) => {
 
 // Register client submission
 exports.registerPost = (req, res) => {
-  global.Logger.info('Request POST API call on /api/auth/register');
+  global.Logger.info(`Request ${req.method} API call on /api/auth/register`);
   const form = req.body;
-  // Prevent wrong arguments sent to POST
-  if (!form.username || !form.email || !form.code || !form.pass1 || !form.pass2) {
+  // Prevent wrong arguments sent to API
+  if (form.username === undefined || form.email === undefined || form.code === undefined || form.pass1 === undefined || form.pass2 === undefined) {
     const responseObject = global.Logger.buildResponseFromCode('B_REGISTER_INVALID_FIELD');
     res.status(responseObject.status).send(responseObject);
     return;
@@ -253,27 +229,28 @@ exports.registerPost = (req, res) => {
     return;
   }
   // Create user from model with form info
-  const user = new User({
+  global.Logger.info('Form data is valid, now testing if registration if valid as well');
+  const user = UserHelper.new({
     username: form.username,
     email: form.email,
     code: utils.genInviteCode(),
-    password: bcrypt.hashSync(form.pass1, 8),
+    password: bcrypt.hashSync(form.pass1, config.saltRounds),
     depth: 0, // Init with depth 0, updated later in godfather checks
   });
   // Check whether it's first register or not by counting item in User table
-  User.countDocuments({}, (userCountErr, count) => {
-    if (userCountErr) {
-      const responseObject = global.Logger.buildResponseFromCode('B_INTERNAL_ERROR_USER_COUNT', {}, userCountErr);
-      res.status(responseObject.status).send(responseObject);
-      return;
-    }
+  global.Logger.info('Determine if registration is for the first account on app');
+  UserHelper.count().then(count => {
     // Finalize registration
-    finalizeRegistration({
+    global.Logger.info(`Found ${count} registered user(s), now finalize registration process`);
+    _finalizeRegistration({
       res: res,
       user: user,
       form: form,
       firstAccount: (count === 0)
     });
+  }).catch(opts => {
+    const responseObject = global.Logger.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
   });
 };
 
