@@ -110,6 +110,40 @@ if (editProfilePasswordSubmit) {
 }
 
 
+const editProfileAvatarSubmit = document.querySelector('#edit-profile-avatar-submit');
+if (editProfileAvatarSubmit) {
+  const dom = {
+    avatar: document.querySelector('#avatar'),
+    error: document.querySelector('#error-output'),
+    loading: document.querySelector('#line-loader')
+  };
+
+  const processResponse = res => {
+    dom.loading.style.opacity = '0';
+    dom.error.innerHTML = res.message;
+    if (res.status === 200) {
+      window.location.href = res.url;
+    } else {
+      dom.error.classList.add('error');
+      if (res.code === 'B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD') {
+        dom.avatar.classList.add('error');
+      } else if (res.code === 'F_KOM_XHR_ERROR') {
+        console.log('tmp')
+      }
+    }
+  };
+
+  editProfileAvatarSubmit.addEventListener('click', event => {
+    event.preventDefault();
+    const formData = new FormData(document.querySelector('#edit-profile-avatar-form'));
+    dom.loading.style.opacity = '1';
+    dom.error.innerHTML = '';
+    clearErrorClasses(dom);
+    kom.xhr('POST', '/api/user/update/avatar', formData).then(processResponse).catch(processResponse);
+  });
+}
+
+
 const deleteAccount = document.querySelector('#delete-account');
 if (deleteAccount) {
   const error = document.querySelector('#error-output');

@@ -301,7 +301,7 @@ class Kom {
       // Build XHR with xsrf token
       const xhr = new XMLHttpRequest();
       xhr.open('POST', url);
-      xhr.setRequestHeader('X-XSRF-TOKEN', this._csrfToken);
+      //xhr.setRequestHeader('X-XSRF-TOKEN', this._csrfToken);
       // Register the state change event
       xhr.onreadystatechange = response => {
         if (response.target.readyState === 4) { // Ready state changed has reach the response state
@@ -323,6 +323,26 @@ class Kom {
       // Create form data and send it through the XHR
       const formData = new FormData(form);
       xhr.send(formData);
+    });
+  }
+
+
+  xhr(verb, url, data) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(verb, url, true);
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            resolve(JSON.parse(xhr.statusText));
+          }
+        }
+      };
+      // XHR error handling
+      xhr.onerror = () => { reject({ code: 'F_KOM_XHR_ERROR' }); };
+      xhr.send(data);
     });
   }
 

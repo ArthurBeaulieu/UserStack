@@ -1,4 +1,6 @@
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 const authConfig = require('../config/auth.config');
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
@@ -101,6 +103,7 @@ exports.profileEditTemplate = (req, res) => {
       layout: 'user',
       username: user.username,
       email: user.email,
+      avatar: `/img/avatar/${user.avatar}.png`,
     });
   }).catch(opts => {
     global.log.buildResponseFromCode(opts.code, {}, opts.err);
@@ -230,6 +233,33 @@ exports.updatePassword = (req, res) => {
   }).catch(opts => {
     const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
     res.status(responseObject.status).send(responseObject);
+  });
+};
+
+
+// Submission to update avatar
+exports.updateAvatar = (req, res) => {
+  UserHelper.get({ id: req.userId }).then(user => {
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, `../../assets/img/avatar/${user.avatar}.png`);
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const acceptedExt = ['.png', '.jpg', '.gif', '.bmp', '.webp'];
+    if (acceptedExt.indexOf(ext) !== -1) {
+      fs.rename(tempPath, targetPath, err => {
+        if (err) return;
+        // TODO proper code error
+        const responseObject = global.log.buildResponseFromCode('B_REGISTER_SUCCESS', { url: '/profile/edit' }, user.username);
+        res.status(responseObject.status).send(responseObject);
+      });
+    } else {
+      // TODO handle properly not supported format
+      fs.unlink(tempPath, err => {
+        if (err) return;
+        res.status(403).contentType("text/plain").end("Only .png files are allowed!");
+      });
+    }
+  }).catch(opts => {
+
   });
 };
 

@@ -1,4 +1,4 @@
-const { authMiddleware } = require('../middlewares');
+const { authMiddleware, userMiddleware } = require('../middlewares');
 const controller = require('../controllers/user.controller');
 
 
@@ -11,4 +11,5 @@ module.exports = app => {
   app.post('/api/user/update/info', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.updateInfo);
   app.post('/api/user/update/role', [authMiddleware.isLoggedIn, authMiddleware.isActivated, authMiddleware.isAdmin], controller.updateRole);
   app.post('/api/user/update/password', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.updatePassword);
+  app.post('/api/user/update/avatar', [authMiddleware.isLoggedIn, authMiddleware.isActivated, userMiddleware.uploadAvatar], controller.updateAvatar);
 };

@@ -18,6 +18,12 @@
   <input id="pass3" type="password" name="pass3">
   <input id="edit-profile-password-submit" type="submit" value="Submit">
 </form>
+<form id="edit-profile-avatar-form" enctype="multipart/form-data">
+  <img src="{{avatar}}" alt="current-user-avatar">
+  <label for="avatar">Select new avatar</label>
+  <input id="avatar" type="file" name="avatar" accept="image/*">
+  <input id="edit-profile-avatar-submit" type="submit" value="Submit">
+</form>
 <button id="delete-account">Delete account</button>
 <a href="/profile">Profile</a>
 {{> 'loader/lineloader'}}
