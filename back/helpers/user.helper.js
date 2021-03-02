@@ -138,13 +138,13 @@ exports.isLoggedIn = req => {
 exports.isAdminUser = user => {
   return new Promise((resolve, reject) => {
     if (!user || !user.roles) {
-      global.Logger.error('No user provided to retrieve roles from');
+      global.log.error('No user provided to retrieve roles from');
       reject();
     }
 
     Role.find({ _id: { $in: user.roles } }, (err, roles) => {
       if (err) {
-        global.Logger.error('Unable to retrieve roles for user');
+        global.log.error('Unable to retrieve roles for user');
         reject();
       }
       // Search for admin role in user's role list

@@ -5,6 +5,7 @@ const User = mongoose.model('User', new mongoose.Schema({
   active: { type: Boolean, default: false },
   username: { type: String, unique: true },
   email: { type: String, unique: true },
+  avatar: String,
   code: String,
   password: String,
   registration: Date,

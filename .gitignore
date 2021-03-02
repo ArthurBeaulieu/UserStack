@@ -1,4 +1,5 @@
 .idea
+assets/img/avatar
 node_modules
 back/log
 .env

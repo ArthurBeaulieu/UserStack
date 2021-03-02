@@ -1,5 +1,8 @@
 # UserStack
 
+![](https://badgen.net/badge/version/0.1.2/blue)
+[![License](https://img.shields.io/github/license/ArthurBeaulieu/UserStack.svg)](https://github.com/ArthurBeaulieu/UserStack/blob/master/LICENSE.md)
+
 This template provides a basic user system built with Node.js, Express Js and MongoDB.
 
 It provides a public homepage (that do not require a registered user), a registration and login process, a private homepage for registered users, and an admin panel.

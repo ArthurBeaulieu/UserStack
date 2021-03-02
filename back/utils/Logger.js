@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const i18n = require('i18n'); // Build response messages using i18n errors
-const text = require('./logger.json'); // Server console logging messages in english, no need for i18n
+const text = require('./json/logger.json'); // Server console logging messages in english, no need for i18n
 const utils = require('./server.utils');
 
 

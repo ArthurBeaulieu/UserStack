@@ -9,5 +9,7 @@
   <input id="password" type="password" name="password">
   <input id="login-submit" type="submit" value="Submit">
 </form>
-<a href="/register">Register</a>
+{{#if allowRegistration}}
+  <a href="/register">Register</a>
+{{/if}}
 {{> 'loader/lineloader'}}

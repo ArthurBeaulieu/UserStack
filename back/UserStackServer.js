@@ -8,18 +8,23 @@ const path = require('path');
 const handlebars = require('express-handlebars');
 const db = require('./models');
 const dbConfig = require('./config/db.config');
+const settings = require('./utils/settings');
 const logger = require('./utils/logger');
 const utils = require('./utils/server.utils');
 
 
-// Create Logger instance and attach it to the global object to make it available app-wide
-global.Logger = new logger({
+// Create logger instance and attach it to the global object to make it available app-wide
+global.log = new logger({
   debug: true
 });
 
 
+// Create setting instance to load app settings from util class
+global.settings = new settings();
+
+
 // Express configuration for server
-global.Logger.info('Starting UserStack server...');
+global.log.info('Starting UserStack server...');
 const app = express();
 app.use(express.static('assets'));
 app.use(cors({ origin: 'http://localhost:3001' }));
@@ -29,7 +34,7 @@ app.use(cookieParser());
 
 
 // i18n translation configuration
-global.Logger.info('Configuring i18n engine');
+global.log.info('Configuring i18n engine');
 i18n.configure({
   locales: ['en', 'fr'],
   cookie: 'locale',
@@ -41,7 +46,7 @@ app.use(i18n.init);
 
 
 // Handlebars template engine configuration
-global.Logger.info('Configuring template rendering engine');
+global.log.info('Configuring template rendering engine');
 app.set('view engine', 'handlebars');
 app.set('views', `${__dirname}/views`);
 app.engine('handlebars', handlebars({
@@ -60,7 +65,7 @@ app.engine('handlebars', handlebars({
 
 
 // App urls routing
-global.Logger.info('Reading routes to be used by client');
+global.log.info('Reading routes to be used by client');
 require('./routes/app.routes')(app);
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
@@ -68,7 +73,7 @@ require('./routes/admin.routes')(app);
 
 
 // Database connection and app starting
-global.Logger.info('Connecting server to the database');
+global.log.info('Connecting server to the database');
 db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.NAME}`, {
   authSource: dbConfig.NAME,
   user: dbConfig.USERNAME,
@@ -77,25 +82,25 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.NAME
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
-  global.Logger.info('Connection to MongoDB successful');
+  global.log.info('Connection to MongoDB successful');
   // Perform initial sequence to check for proper collection
   utils.initSequence().then(() => {
     // Start listening for events on port 3000
     app.listen(3000, () => {
-      global.Logger.info('UserStack server is ready to operate!');
+      global.log.info('UserStack server is ready to operate!');
     });
     // Add listener on kill process to properly log before exit
     process.on('SIGINT', () => {
-      global.Logger.info('Gracefully stopping UserStack server');
+      global.log.info('Gracefully stopping UserStack server');
       process.exit();
     });
   }).catch(err => {
-    global.Logger.error(`Unable to update database model : ${err}`);
-    global.Logger.error('Gracefully stopping UserStack server');
+    global.log.error(`Unable to update database model : ${err}`);
+    global.log.error('Gracefully stopping UserStack server');
     process.exit();
   });
 }).catch(err => {
-  global.Logger.error(`Unable to connect to the database : ${err}`);
-  global.Logger.error('Gracefully stopping UserStack server');
+  global.log.error(`Unable to connect to the database : ${err}`);
+  global.log.error('Gracefully stopping UserStack server');
   process.exit();
 });

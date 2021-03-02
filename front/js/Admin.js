@@ -2,9 +2,9 @@ import '../scss/Admin.scss';
 import Kom from './utils/Kom';
 const kom = new Kom();
 
-const rolesList = document.querySelector('#roles-list');
+const lockRegistration = document.querySelector('#lock-registration');
 const usersList = document.querySelector('#users-list');
-if (rolesList && usersList) {
+if (lockRegistration && usersList) {
   const error = document.querySelector('#error-output');
 
   for (let i = 0; i < usersList.children.length; ++i) {
@@ -46,4 +46,19 @@ if (rolesList && usersList) {
       kom.post('/api/user/delete', parameters).then(processResponse).catch(processResponse);
     });
   }
+
+  lockRegistration.addEventListener('change', () => {
+    const processResponse = res => {
+      if (res.status === 200) {
+        window.location = '/admin/users';
+      } else if (res.code === 'B_NEVER_KILL_ROOT') {
+        error.innerHTML = res.message;
+      }
+    };
+
+    const parameters = {
+      lockRegistration: lockRegistration.checked
+    };
+    kom.post('/api/admin/update/settings', parameters).then(processResponse).catch(processResponse);
+  });
 }

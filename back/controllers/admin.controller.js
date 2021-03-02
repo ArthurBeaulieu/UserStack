@@ -1,19 +1,18 @@
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
-//TODO allow/forbid registration saved to config?
 
 
 // Private /admin template (for authenticated admin users)
 exports.adminTemplate = (req, res) => {
-  global.Logger.info('Rendering template for the /admin page');
+  global.log.info('Rendering template for the /admin page');
   res.render('partials/admin/menu', { layout : 'admin' });
 };
 
 
 // Private /admin/users template (for authenticated admin users)
 exports.adminUsersTemplate = (req, res) => {
-  global.Logger.info('Request template for the /admin/users page');
+  global.log.info('Request template for the /admin/users page');
   // Internal variables for template
   const promises = [];
   const usersFormatted = [];
@@ -34,6 +33,7 @@ exports.adminUsersTemplate = (req, res) => {
             id: users[i]._id,
             username: users[i].username,
             email: users[i].email,
+            avatar: `/img/avatar/${users[i].avatar}.png`,
             registration: utils.formatDate(users[i].registration),
             lastLogin: utils.formatDate(users[i].lastlogin),
             godfather: null,
@@ -63,19 +63,29 @@ exports.adminUsersTemplate = (req, res) => {
           usersFormatted.push(user);
         }
       }).catch(err => {
-        global.Logger.error(`Unable to retrieve all roles, ${err}`);
+        global.log.error(`Unable to retrieve all roles, ${err}`);
       });
     }).catch(err => {
-      global.Logger.error(`Unable to retrieve all users, ${err}`);
+      global.log.error(`Unable to retrieve all users, ${err}`);
     });
     resolve();
   }));
   // On all promises resolution, render template
   Promise.all(promises).then(() => {
-    global.Logger.info('Rendering template for the /admin/users page');
+    global.log.info('Rendering template for the /admin/users page');
     res.render('partials/admin/users', {
       layout : 'admin',
-      users: usersFormatted
+      users: usersFormatted,
+      locked: global.settings.get('lockRegistration')
     });
   });
+};
+
+
+exports.updateSetting = (req, res) => {
+  global.log.info(`Request ${req.method} API call on /api/admin/update/settings`);
+  const form = req.body;
+  if (form.hasOwnProperty('lockRegistration')) {
+    global.settings.set('lockRegistration', form.lockRegistration);
+  }
 };

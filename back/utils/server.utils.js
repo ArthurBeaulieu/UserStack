@@ -15,6 +15,11 @@ exports.genInviteCode = () => {
 };
 
 
+exports.genAvatarName = () => {
+  return crypto.randomBytes(10).toString('hex').toLowerCase();
+};
+
+
 exports.formatDate = rawDate => {
   // Format dat according to parameter, if no date were provided, simply use now date instead
   let d = (rawDate ? new Date(rawDate) : new Date());
@@ -27,21 +32,21 @@ exports.formatDate = rawDate => {
 
 exports.initSequence = () => {
   return new Promise((resolve, reject) => {
-    global.Logger.info('UserStack init sequence to control the database state');
+    global.log.info('UserStack init sequence to control the database state');
     const promises = [];
     // Check user roles collection
     promises.push(new Promise((resolve, reject) => {
       Role.estimatedDocumentCount((err, count) => {
         if (!err && count === 0) {
           const rolePromises = [];
-          global.Logger.info('Creating Roles for current instance...');
+          global.log.info('Creating Roles for current instance...');
           rolePromises.push(new Promise((resolve, reject) => {
             new Role({ name: 'user' }).save(roleSaveErr => {
               if (roleSaveErr) {
-                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
+                global.log.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
                 reject();
               } else {
-                global.Logger.info('User role has been added to the roles collection');
+                global.log.info('User role has been added to the roles collection');
                 resolve();
               }
             });
@@ -49,28 +54,28 @@ exports.initSequence = () => {
           rolePromises.push(new Promise((resolve, reject) => {
             new Role({ name: 'admin' }).save(roleSaveErr => {
               if (roleSaveErr) {
-                global.Logger.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
+                global.log.logFromCode('B_INTERNAL_ERROR_ROLE_SAVE', roleSaveErr);
                 reject();
               } else {
-                global.Logger.info('Admin role has been added to the roles collection');
+                global.log.info('Admin role has been added to the roles collection');
                 resolve();
               }
             });
           }));
           Promise.all(rolePromises).then(() => {
-            global.Logger.info('Roles collection is up to date');
+            global.log.info('Roles collection is up to date');
             resolve();
           }).catch(() => {
             reject();
           });
         } else {
-          global.Logger.info('Roles collection is up to date');
+          global.log.info('Roles collection is up to date');
           resolve();
         }
       });
     }));
     Promise.all(promises).then(() => {
-      global.Logger.info('Database model is complete');
+      global.log.info('Database model is complete');
       resolve();
     }).catch(reject);
   });
