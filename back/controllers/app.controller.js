@@ -1,7 +1,7 @@
 const UserHelper = require('../helpers/user.helper');
 
 
-// Public / template
+// Public template, /
 exports.publicHomepageTemplate = (req, res) => {
   global.log.info('Request template for the / page');
   UserHelper.isLoggedIn(req).then(isLoggedIn => {
@@ -14,7 +14,7 @@ exports.publicHomepageTemplate = (req, res) => {
 };
 
 
-// Private /home template (for authenticated users)
+// Private template (for authenticated users), /home
 exports.homepageTemplate = (req, res) => {
   global.log.info('Request template for the /home page');
   global.log.info(`Search a matching user for id ${req.userId}`);

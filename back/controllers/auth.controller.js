@@ -165,14 +165,14 @@ const _sendActivationToken = opts => {
 /* Exported methods */
 
 
-// Public /login template
+// Public template, /login
 exports.loginTemplate = (req, res) => {
   global.log.info('Rendering template for the /login page');
   res.render('partials/auth/login', { layout: 'auth', allowRegistration: !global.settings.get('lockRegistration') });
 };
 
 
-// Login client submission
+// Login client submission, /api/auth/login
 exports.loginPost = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/auth/login`);
   const form = req.body;
@@ -217,14 +217,14 @@ exports.loginPost = (req, res) => {
 };
 
 
-// Public /register template
+// Public template, /register
 exports.registerTemplate = (req, res) => {
   global.log.info('Rendering template for the /register page');
   res.render('partials/auth/register', { layout: 'auth' });
 };
 
 
-// Register client submission
+// Register client submission, /api/auth/register
 exports.registerPost = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/auth/register`);
   const form = req.body;
@@ -261,7 +261,7 @@ exports.registerPost = (req, res) => {
 };
 
 
-// Register activation using token sent by email to new user
+// Register activation using token sent by email to new user, /register/activate
 exports.registerActivateTemplate = (req, res) => {
   global.log.info('Request template for the /register/activate page');
   UserHelper.get({ id: req.userId }).then(user => {
@@ -289,7 +289,7 @@ exports.registerActivateTemplate = (req, res) => {
 };
 
 
-// Verify user (set it active) when auth token is consumed
+// Verify user (set it active) when auth token is consumed, /verify/:email/:token
 exports.verify = (req, res) => {
   global.log.info(`Request a token activation for ${req.params.email} from /verify/:email/:token`);
   AuthTokenHelper.get(req.params.token).then(authToken => {
@@ -324,7 +324,7 @@ exports.verify = (req, res) => {
 };
 
 
-// Logout redirection url -> clear cookies and redirect to public homepage
+// Logout redirection url -> clear cookies and redirect to public homepage, /logout
 exports.logout = (req, res) => {
   global.log.info('Request /logout action');
   res.clearCookie('jwtToken');

@@ -3,14 +3,14 @@ const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
 
 
-// Private /admin template (for authenticated admin users)
+// Private template (for authenticated admin users), /admin
 exports.adminTemplate = (req, res) => {
   global.log.info('Rendering template for the /admin page');
   res.render('partials/admin/menu', { layout : 'admin' });
 };
 
 
-// Private /admin/users template (for authenticated admin users)
+// Private template (for authenticated admin users), /admin/users
 exports.adminUsersTemplate = (req, res) => {
   global.log.info('Request template for the /admin/users page');
   // Internal variables for template
@@ -82,10 +82,13 @@ exports.adminUsersTemplate = (req, res) => {
 };
 
 
+// Update global app setting, /api/admin/update/settings
 exports.updateSetting = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/admin/update/settings`);
   const form = req.body;
   if (form.hasOwnProperty('lockRegistration')) {
     global.settings.set('lockRegistration', form.lockRegistration);
+    const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'lock registration');
+    res.status(responseObject.status).send(responseObject);
   }
 };

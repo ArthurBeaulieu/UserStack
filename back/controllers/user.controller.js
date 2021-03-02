@@ -46,7 +46,7 @@ const _connectChildrenToGodfather = (godfather, children) => {
 /* Exported methods */
 
 
-// Private /profile template (for authenticated users)
+// Private /profile template (for authenticated users), /profile
 exports.profileTemplate = (req, res) => {
   global.log.info('Request template for the /profile page');
   global.log.info(`Search a matching user for id ${req.userId}`);
@@ -93,7 +93,7 @@ exports.profileTemplate = (req, res) => {
 };
 
 
-// Private /profile/edit template (for authenticated users)
+// Private /profile/edit template (for authenticated users), /profile/edit
 exports.profileEditTemplate = (req, res) => {
   global.log.info('Request template for the /profile/edit page');
   // Find matching user for token ID
@@ -112,7 +112,7 @@ exports.profileEditTemplate = (req, res) => {
 };
 
 
-// Submission from user information submit
+// Submission from user information submit, /api/user/update/info
 exports.updateInfo = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/user/update/info`);
   const form = req.body;
@@ -201,7 +201,7 @@ exports.updateInfo = (req, res) => {
 };
 
 
-// Submission from user password fields submit
+// Submission from user password fields submit, /api/user/update/password
 exports.updatePassword = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/user/update/password`);
   const form = req.body;
@@ -237,34 +237,45 @@ exports.updatePassword = (req, res) => {
 };
 
 
-// Submission to update avatar
+// Submission to update avatar, /api/user/update/avatar
 exports.updateAvatar = (req, res) => {
+  global.log.info(`Request ${req.method} API call on /api/user/update/avatar`);
+  global.log.info(`Search a matching user for id ${req.userId}`);
   UserHelper.get({ id: req.userId }).then(user => {
     const tempPath = req.file.path;
     const targetPath = path.join(__dirname, `../../assets/img/avatar/${user.avatar}.png`);
     const ext = path.extname(req.file.originalname).toLowerCase();
     const acceptedExt = ['.png', '.jpg', '.gif', '.bmp', '.webp'];
     if (acceptedExt.indexOf(ext) !== -1) {
+      global.log.info(`Replacing avatar with name ${user.avatar}`);
       fs.rename(tempPath, targetPath, err => {
-        if (err) return;
-        // TODO proper code error
-        const responseObject = global.log.buildResponseFromCode('B_REGISTER_SUCCESS', { url: '/profile/edit' }, user.username);
+        if (err) {
+          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_RENAME_ERROR', {}, err);
+          res.status(responseObject.status).send(responseObject);
+          return;
+        }
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_SUCCESS', { url: '/profile/edit' }, user.username);
         res.status(responseObject.status).send(responseObject);
       });
     } else {
-      // TODO handle properly not supported format
       fs.unlink(tempPath, err => {
-        if (err) return;
-        res.status(403).contentType("text/plain").end("Only .png files are allowed!");
+        if (err) {
+          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_UNLINK_ERROR', {}, err);
+          res.status(responseObject.status).send(responseObject);
+          return;
+        }
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_UNSUPPORTED_FORMAT', {}, err);
+        res.status(responseObject.status).send(responseObject);
       });
     }
   }).catch(opts => {
-
+    const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
   });
 };
 
 
-// Submission from user delete button or admin delete user button
+// Submission from user delete button or admin delete user button, /api/user/update/delete
 exports.delete = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/user/delete`);
   let id = req.userId;
@@ -317,7 +328,7 @@ exports.delete = (req, res) => {
 };
 
 
-// Submission from user role checkbox in admin users page
+// Submission from user role checkbox in admin users page, /api/user/update/role
 exports.updateRole = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/user/update/role`);
   const form = req.body;
