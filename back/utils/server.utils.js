@@ -5,6 +5,11 @@ const db = require('../models');
 const Role = db.role;
 
 
+exports.genAuthToken = () => {
+  return crypto.randomBytes(40).toString('hex').toUpperCase();
+};
+
+
 exports.genInviteCode = () => {
   return crypto.randomBytes(20).toString('hex').toUpperCase();
 };

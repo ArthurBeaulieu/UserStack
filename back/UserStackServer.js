@@ -1,4 +1,4 @@
-const logger = require('./utils/logger');
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -8,6 +8,7 @@ const path = require('path');
 const handlebars = require('express-handlebars');
 const db = require('./models');
 const dbConfig = require('./config/db.config');
+const logger = require('./utils/logger');
 const utils = require('./utils/server.utils');
 
 
@@ -68,7 +69,11 @@ require('./routes/admin.routes')(app);
 
 // Database connection and app starting
 global.Logger.info('Connecting server to the database');
-db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.NAME}`, {
+  authSource: dbConfig.NAME,
+  user: dbConfig.USERNAME,
+  pass: dbConfig.PASSWORD,
+  useCreateIndex: true,
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {

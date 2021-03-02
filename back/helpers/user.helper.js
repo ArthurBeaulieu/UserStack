@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config/auth.config.js');
 const db = require('../models');
+const authConfig = require('../config/auth.config.js');
 
 
 const User = db.user;
@@ -124,7 +124,7 @@ exports.isLoggedIn = req => {
       resolve(false);
     }
     // Check token with jwt token module
-    jwt.verify(token, config.secret, err => {
+    jwt.verify(token, authConfig.secret, err => {
       if (err) {
         resolve(false);
       } else {

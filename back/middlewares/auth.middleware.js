@@ -1,7 +1,43 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config/auth.config.js');
+const authConfig = require('../config/auth.config.js');
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
+
+
+// Middleware to allow access to non-activated user
+isNotActivated = (req, res, next) => {
+  global.Logger.info(`Check if account with id ${req.userId} is not activated`);
+  UserHelper.get({ id: req.userId }).then(user => {
+    if (user.active) {
+      global.Logger.info('Account is activated, redirecting to /home');
+      res.redirect(302, '/home');
+    } else {
+      global.Logger.info('Account is not activated, continue route execution');
+      next();
+    }
+  }).catch(opts => {
+    global.Logger.logFromCode(opts.code, opts.err);
+    res.redirect(302, '/');
+  });
+};
+
+
+// Middleware to allow access to activated user
+isActivated = (req, res, next) => {
+  global.Logger.info(`Check if account with id ${req.userId} is activated`);
+  UserHelper.get({ id: req.userId }).then(user => {
+    if (user.active) {
+      global.Logger.info('Account is activated, continue route execution');
+      next();
+    } else {
+      global.Logger.info('Account is not activated, redirecting to /register/activate');
+      res.redirect(302, '/register/activate');
+    }
+  }).catch(opts => {
+    global.Logger.logFromCode(opts.code, opts.err);
+    res.redirect(302, '/');
+  });
+};
 
 
 // Check token validity from request's cookies to allow access
@@ -15,7 +51,7 @@ isLoggedIn = (req, res, next) => {
     return;
   }
   // Check token with jwt token module
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, authConfig.secret, (err, decoded) => {
     if (err) {
       global.Logger.error('Access refused, the token is either invalid or expired. Redirecting to /login');
       res.redirect(302, '/login');
@@ -126,6 +162,8 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
 
 
 module.exports = {
+  isNotActivated,
+  isActivated,
   isLoggedIn,
   isAdmin,
   checkDuplicateUsernameOrEmail

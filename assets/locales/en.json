@@ -8,6 +8,7 @@
 		"B_LOGIN_INVALID_FIELD": "Data sent to the server does not contain a username and a password",
 		"B_LOGIN_MISSING_FIELD": "One or several fields are empty, please fill them all before submitting your login form",
 		"B_LOGIN_INVALID_PASSWORD": "Provided password is invalid for %s",
+		"B_LOGIN_USER_NOT_ACTIVE": "User is not verified, therefore not active",
 		"B_LOGIN_SUCCESS": "Logged in successfully",
 		"B_REGISTER_INVALID_FIELD": "Data sent to the server does not contain a mandatory field in username, email, code, pass1 and pass2",
 		"B_REGISTER_MISSING_FIELD": "One or several field are empty, please fill them all before submitting your registration form",
@@ -37,6 +38,7 @@
 		"B_USER_DELETE_SUCCESS": "User successfully deleted from database",
 		"B_USER_NOT_FOUND": "Can not find user in database",
 		"B_ROLE_NOT_FOUND": "Can not find role in database",
+		"B_AUTH_TOKEN_NOT_FOUND": "Can not find auth token in database",
 		"B_INVALID_FIELD": "Provided form data is not matching the expected structure",
 		"B_MISSING_FIELD": "One or several field are empty, please fill them all before submitting your form",
 		"B_NEVER_KILL_ROOT": "Deleting the root account is not permitted",
@@ -45,6 +47,9 @@
 		"B_INTERNAL_ERROR_USER_COUNT": "Database error when trying to count users in Users collection",
 		"B_INTERNAL_ERROR_USER_DELETE": "Database error when trying to delete user in Users collection",
 		"B_INTERNAL_ERROR_ROLE_FIND": "Database error when trying to find role in Roles collection",
-		"B_INTERNAL_ERROR_ROLE_SAVE": "Database error when trying to save role in Roles collection"
+		"B_INTERNAL_ERROR_ROLE_SAVE": "Database error when trying to save role in Roles collection",
+		"B_INTERNAL_ERROR_AUTH_TOKEN_FIND": "Database error when trying to find auth token in AuthToken collection",
+		"B_INTERNAL_ERROR_AUTH_TOKEN_SAVE": "Database error when trying to save auth token in AuthToken collection",
+		"B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": "Database error when trying to delete auth token in AuthToken collection"
 	}
 }

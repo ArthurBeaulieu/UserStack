@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 
 
 const User = mongoose.model('User', new mongoose.Schema({
-  username: String,
-  email: String,
+  active: { type: Boolean, default: false },
+  username: { type: String, unique: true },
+  email: { type: String, unique: true },
   code: String,
   password: String,
   registration: Date,
@@ -11,10 +12,7 @@ const User = mongoose.model('User', new mongoose.Schema({
   parent: mongoose.Schema.Types.ObjectId,
   children: [],
   depth: Number,
-  roles: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Role'
-  }]
+  roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }]
 }));
 
 

@@ -8,6 +8,7 @@
 		"B_LOGIN_INVALID_FIELD": "Les données envoyées au serveur doivent contenir un nom d'utilisateur et un mot de passe",
 		"B_LOGIN_MISSING_FIELD": "Un ou plusieurs champs obligatoires sont vides, assurez vous d'avoir remplis les informations nécessaires",
 		"B_LOGIN_INVALID_PASSWORD": "Le mot de passe fournis pour %s est invalide",
+		"B_LOGIN_USER_NOT_ACTIVE": "L'utilisateur n'est pas vérifié et par conséquent, inactif",
 		"B_LOGIN_SUCCESS": "Connexion réussie",
 		"B_REGISTER_INVALID_FIELD": "Les données envoyées au serveur doivent contenir un nom d'utilisateur, un email, un code et deux mots de passe identiques",
 		"B_REGISTER_MISSING_FIELD": "Un ou plusieurs champs obligatoires sont vides, assurez vous d'avoir remplis les informations nécessaires",

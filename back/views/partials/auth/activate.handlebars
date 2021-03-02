@@ -1,0 +1,7 @@
+<h2>Activate</h2>
+{{#if error}}
+<p>Internal server error, couldn't send an activation email. Contact the app administrator</p>
+{{else}}
+<p>An email was sent to {{email}} with a confirmation link ; click on it to activate your account</p>
+<p>Please check your spam if it doesn't appear in your inbox. If however, you've received nothing, refresh this page to send another one.</p>
+{{/if}}

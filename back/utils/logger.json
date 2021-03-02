@@ -14,6 +14,11 @@
     "status": 401,
     "log": "Login submission has been refused because the password does not match the provided user"
   },
+  "B_LOGIN_USER_NOT_ACTIVE": {
+    "type": "warn",
+    "status": 400,
+    "log": "User is not verified, therefore not active"
+  },
   "B_LOGIN_SUCCESS": {
     "type": "info",
     "status": 200,
@@ -159,6 +164,11 @@
     "status": 404,
     "log": "Can not find role in database"
   },
+  "B_AUTH_TOKEN_NOT_FOUND": {
+    "type": "warn",
+    "status": 404,
+    "log": "Can not find auth token in database"
+  },
   "B_INVALID_FIELD": {
     "type": "error",
     "status": 400,
@@ -203,5 +213,20 @@
     "type": "error",
     "status": 500,
     "log": "Database error when trying to save role in Roles collection"
+  },
+  "B_INTERNAL_ERROR_AUTH_TOKEN_FIND": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to find auth token in AuthToken collection"
+  },
+  "B_INTERNAL_ERROR_AUTH_TOKEN_SAVE": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to save auth token in AuthToken collection"
+  },
+  "B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": {
+    "type": "error",
+    "status": 500,
+    "log": "Database error when trying to delete auth token in AuthToken collection"
   }
 }

@@ -1,5 +1,5 @@
-const config = require('../config/auth.config');
 const bcrypt = require('bcryptjs');
+const authConfig = require('../config/auth.config');
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
 const utils = require('../utils/server.utils');
@@ -243,9 +243,9 @@ exports.updatePassword = (req, res) => {
     res.status(responseObject.status).send(responseObject);
     return;
   }
-  // New password doesn't meet the config length
-  if (form.pass2.length < config.passwordLength) {
-    const responseObject = global.Logger.buildResponseFromCode('B_PROFILE_UPDATE_PASSWORD_PASSWORD_TOO_SHORT', {}, config.passwordLength);
+  // New password doesn't meet the auth config length
+  if (form.pass2.length < authConfig.passwordLength) {
+    const responseObject = global.Logger.buildResponseFromCode('B_PROFILE_UPDATE_PASSWORD_PASSWORD_TOO_SHORT', {}, authConfig.passwordLength);
     res.status(responseObject.status).send(responseObject);
     return;
   }
@@ -260,7 +260,7 @@ exports.updatePassword = (req, res) => {
       return;
     }
     // Hashing new password and save it for the user
-    user.password = bcrypt.hashSync(form.pass2, config.saltRounds);
+    user.password = bcrypt.hashSync(form.pass2, authConfig.saltRounds);
     UserHelper.save(user).then(() => {
       // Send password update success to the client
       const responseObject = global.Logger.buildResponseFromCode('B_PROFILE_UPDATE_PASSWORD_SUCCESS');
