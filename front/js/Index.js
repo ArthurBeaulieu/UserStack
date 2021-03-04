@@ -1,7 +1,7 @@
-import '../scss/App.scss';
+import '../scss/Index.scss';
 
 
-class App {
+class Index {
 
 
   constructor() {
@@ -17,5 +17,5 @@ class App {
 }
 
 
-window.app = new App();
-export default App;
+window.app = new Index();
+export default Index;

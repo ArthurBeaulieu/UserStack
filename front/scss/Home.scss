@@ -1,0 +1,54 @@
+@import 'tools/global';
+
+body {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  position: relative;
+  width: 100vw;
+}
+
+.page-content {
+  max-width: 90%;
+  padding: 2rem 4rem;
+  text-align: center;
+}
+
+.menu-wrapper {
+  display: flex;
+  justify-content: space-around;
+
+  .menu-item {
+    align-items: center;
+    border: solid 3px var(--color-border);
+    border-radius: var(--radius);
+    box-sizing: content-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem;
+    padding: 2rem 3rem;
+    width: 10rem;
+
+    transition: background-color var(--transition) ease-in;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: var(--color-bg);
+    }
+
+    img {
+      height: 3rem;
+      margin-bottom: 1rem;
+      width: 3rem;
+    }
+  }
+
+  a {
+    font-weight: bold;
+    text-decoration: none;
+  }
+}

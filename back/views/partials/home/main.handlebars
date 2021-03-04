@@ -1,5 +1,22 @@
-{{#if this.isAdmin}}
-  <a href="/admin">{{__ "admin.nav.home"}}</a>
-{{/if}}
-<a href="/profile">{{__ "user.nav.profile"}}</a>
-<a href="/logout">{{__ "auth.nav.logout"}}</a>
+<div class="menu-wrapper">
+  {{#if this.isAdmin}}
+    <a href="/admin">
+      <div class="menu-item">
+        <img src="/img/auth/admin.svg">
+        <p>{{__ "admin.nav.home"}}</p>
+      </div>
+    </a>
+  {{/if}}
+  <a href="/profile">
+    <div class="menu-item">
+      <img src="/img/auth/profile.svg">
+      <p>{{__ "user.nav.profile"}}</p>
+    </div>
+  </a>
+  <a href="/logout">
+    <div class="menu-item">
+      <img src="/img/auth/logout.svg">
+      <p>{{__ "auth.nav.logout"}}</p>
+    </div>
+  </a>
+</div>

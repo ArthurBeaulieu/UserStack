@@ -5,9 +5,10 @@ const plugins = require('./plugins');
 
 module.exports = {
   entry: {
-    app: './front/js/App.js',
     auth: './front/js/Auth.js',
     admin: './front/js/Admin.js',
+    home: './front/js/Home.js',
+    index: './front/js/Index.js',
     user: './front/js/User.js'
   },
   module: {

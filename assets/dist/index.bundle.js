@@ -10,23 +10,23 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./front/js/App.js":
-/*!*************************!*\
-  !*** ./front/js/App.js ***!
-  \*************************/
+/***/ "./front/js/Index.js":
+/*!***************************!*\
+  !*** ./front/js/Index.js ***!
+  \***************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _scss_App_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/App.scss */ \"./front/scss/App.scss\");\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar App = /*#__PURE__*/function () {\n  function App() {\n    _classCallCheck(this, App);\n\n    this._init();\n  }\n\n  _createClass(App, [{\n    key: \"_init\",\n    value: function _init() {\n      console.log('Welcome to UserStack');\n    }\n  }]);\n\n  return App;\n}();\n\nwindow.app = new App();\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);\n\n//# sourceURL=webpack://UserStack/./front/js/App.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _scss_Index_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/Index.scss */ \"./front/scss/Index.scss\");\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar Index = /*#__PURE__*/function () {\n  function Index() {\n    _classCallCheck(this, Index);\n\n    this._init();\n  }\n\n  _createClass(Index, [{\n    key: \"_init\",\n    value: function _init() {\n      console.log('Welcome to UserStack');\n    }\n  }]);\n\n  return Index;\n}();\n\nwindow.app = new Index();\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Index);\n\n//# sourceURL=webpack://UserStack/./front/js/Index.js?");
 
 /***/ }),
 
-/***/ "./front/scss/App.scss":
-/*!*****************************!*\
-  !*** ./front/scss/App.scss ***!
-  \*****************************/
+/***/ "./front/scss/Index.scss":
+/*!*******************************!*\
+  !*** ./front/scss/Index.scss ***!
+  \*******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack://UserStack/./front/scss/App.scss?");
+eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack://UserStack/./front/scss/Index.scss?");
 
 /***/ })
 
@@ -89,7 +89,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extr
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./front/js/App.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./front/js/Index.js");
 /******/ 	window.UserStack = __webpack_exports__.default;
 /******/ 	
 /******/ })()
