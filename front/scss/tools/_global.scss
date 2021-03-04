@@ -53,3 +53,20 @@ input {
     border-color: var(--color-red);
   }
 }
+
+.feedback-wrapper {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  margin-left: 50%;
+  margin-top: 2rem;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  transform: translateX(-50%);
+
+  p {
+    font-style: italic;
+  }
+}

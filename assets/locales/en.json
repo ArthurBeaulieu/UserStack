@@ -75,11 +75,9 @@
 		"headDesc": "Profile page for UserStack application",
 		"pageTitle": "UserStack - User",
 		"nav": {
-			"profile": "Profile",
-			"edit": "Edit profile"
+			"profile": "Profile"
 		},
 		"profile": {
-			"title": "User profile summary",
 			"username": "Username",
 			"email": "Email",
 			"code": "Invitation code",
@@ -87,7 +85,6 @@
 			"godfather": "Godfather",
 			"registration": "Registration date",
 			"lastLogin": "Last login date",
-			"roles": "Roles",
 			"adminRole": "Administrator",
 			"userRole": "User"
 		},

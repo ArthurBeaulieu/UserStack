@@ -1,7 +1,4 @@
 <h2>{{__ "user.edit.title"}}</h2>
-<div>
-  <p id="error-output"></p>
-</div>
 <form id="edit-profile-info-form">
   <label for="username">{{__ "user.edit.username"}}</label>
   <input id="username" type="text" name="username" value="{{username}}">
@@ -37,4 +34,3 @@
 </form>
 <button id="delete-account">{{__ "user.edit.delete"}}</button>
 <a href="/profile">{{__ "user.nav.profile"}}</a>
-{{> 'loader/lineloader'}}

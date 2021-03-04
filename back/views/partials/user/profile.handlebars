@@ -1,27 +1,24 @@
-<h2>{{__ "user.profile.title"}}</h2>
-<div id="profile-page">
-  <p id="error-output"></p>
+<a href="/home" class="page-navigation">
+  <img src="/img/nav/home.svg">
+  <p>{{__ "home.nav.home"}}</p>
+</a>
+<div class="avatar-wrapper">
   <img src="{{avatar}}" alt="user-avatar">
-  <p>{{__ "user.profile.username"}}</p>
-  <p><b>{{username}}</b></p>
-  <p>{{__ "user.profile.email"}}</p>
-  <p><b>{{email}}</b></p>
-  <p>{{__ "user.profile.code"}}</p>
-  <p><b>{{code}}</b></p>
-  <p>{{__ "user.profile.depth"}}</p>
-  <p><b>{{depth}}</b></p>
-  <p>{{__ "user.profile.godfather"}}</p>
-  <p><b>{{godfather}}</b></p>
-  <p>{{__ "user.profile.registration"}}</p>
-  <p><b>{{registration}}</b></p>
-  <p>{{__ "user.profile.lastLogin"}}</p>
-  <p><b>{{lastLogin}}</b></p>
-  <p>{{__ "user.profile.roles"}}</p>
   <ul class="roles">
     {{#each roles}}
       <li><b>{{this}}</b></li>
     {{/each}}
   </ul>
-  <a href="/profile/edit">{{__ "user.nav.edit"}}</a>
-  <a href="/home">{{__ "home.nav.home"}}</a>
+</div>
+<div class="info-wrapper">
+  <p>{{__ "user.profile.username"}} : <b>{{username}}</b></p>
+  <p>{{__ "user.profile.email"}} : <b>{{email}}</b></p>
+  <p>{{__ "user.profile.code"}} : <b>{{code}}</b></p>
+  <p>{{__ "user.profile.depth"}} : <b>{{depth}}</b></p>
+  <p>{{__ "user.profile.godfather"}} : <b>{{godfather}}</b></p>
+  <p>{{__ "user.profile.registration"}} : <b>{{registration}}</b></p>
+  <p>{{__ "user.profile.lastLogin"}} : <b>{{lastLogin}}</b></p>
+  <a href="/profile/edit" class="edit-profile">
+    <img src="/img/action/edit.svg">
+  </a>
 </div>
