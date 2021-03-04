@@ -1,5 +1,13 @@
 :root {
-  --color: white;
+  --color-red: rgb(233, 33, 33);
+
+  --color-bg: rgb(200, 200, 200);
+  --color-border: rgb(133, 133, 133);
+  --color-border-selected: rgb(166, 166, 166);
+
+  --radius: 5px;
+
+  --transition: .2s;
 }
 
 * {
@@ -15,4 +23,33 @@ html {
 
 body {
   font-size: 1.2rem;
+}
+
+input {
+  background: transparent;
+  border: solid 1px var(--color-border);
+  border-radius: var(--radius);
+  padding: .5rem;
+  text-align: center;
+
+  transition: border var(--transition) ease-in, background-color var(--transition) ease-out;
+
+  &:active,
+  &:focus,
+  &:hover {
+    border-color: var(--color-border-selected);
+
+    &[type="submit"] {
+      background-color: var(--color-border);
+    }
+  }
+
+  &[type="submit"] {
+    cursor: pointer;
+    width: min-content;
+  }
+
+  &.error {
+    border-color: var(--color-red);
+  }
 }

@@ -2,9 +2,10 @@
 
 .line-loader {
   font-size: 1.4rem;
+  height: 2.2rem;
   text-align: center;
   width: 10rem;
-  transition: opacity .2s;
+  transition: opacity var(--transition) ease-out;
 
   .line-loader-dots {
     margin-left: -1.5em;

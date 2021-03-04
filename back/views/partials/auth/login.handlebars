@@ -1,7 +1,4 @@
 <h2>{{__ "auth.login.title"}}</h2>
-<div>
-  <p id="error-output"></p>
-</div>
 <form id="login-form">
   <label for="username">{{__ "auth.login.username"}}</label>
   <input id="username" type="text" name="username">
@@ -12,4 +9,3 @@
 {{#if allowRegistration}}
   <a href="/register">{{__ "auth.nav.register"}}</a>
 {{/if}}
-{{> 'loader/lineloader'}}

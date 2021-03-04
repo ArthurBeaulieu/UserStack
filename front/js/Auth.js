@@ -130,7 +130,7 @@ if (loginSubmit) {
       } else if (res.code === 'B_LOGIN_MISSING_FIELD') {
         if (res.missing.username) { dom.username.classList.add('error'); }
         if (res.missing.password) { dom.password.classList.add('error'); }
-      } else if (res.code === 'B_LOGIN_USER_NOT_FOUND') {
+      } else if (res.code === 'B_USER_NOT_FOUND') {
         dom.username.classList.add('error');
       } else if (res.code === 'B_LOGIN_INVALID_PASSWORD') {
         dom.password.classList.add('error');
