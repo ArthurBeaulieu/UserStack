@@ -2,9 +2,11 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 const authConfig = require('../config/auth.config');
+const fileConfig = require('../config/file.config');
 const UserHelper = require('../helpers/user.helper');
 const RoleHelper = require('../helpers/role.helper');
 const FormHelper = require('../helpers/form.helper');
+const identicon = require('../utils/identicon');
 const utils = require('../utils/server.utils');
 
 
@@ -57,15 +59,15 @@ exports.profileTemplate = (req, res) => {
       RoleHelper.get({ filter: { _id: user.roles }, multiple: true }).then(userRoles => {
         const roles = [];
         for (let i = 0; i < userRoles.length; ++i) {
-          roles.push(userRoles[i].name);
+          roles.push(utils.i18nLocal(req, `user.profile.${userRoles[i].name}Role`));
         }
-
         global.log.info('Rendering template for the /profile page');
         res.render('partials/user/profile', {
           layout: 'user',
+          lang: req.locale,
           username: user.username,
           email: user.email,
-          avatar: `/img/avatar/${user.avatar}.png`,
+          avatar: `/img/avatars/${user.avatar}`,
           code: user.code,
           depth: user.depth,
           godfather: godfather.username,
@@ -99,11 +101,19 @@ exports.profileEditTemplate = (req, res) => {
   // Find matching user for token ID
   UserHelper.get({ id: req.userId }).then(user => {
     global.log.info('Rendering template for the /profile/edit page');
+    const avatarList = [];
+    if (user.avatarList.length > 1) {
+      for (let i = user.avatarList.length - 2; i >= 0; --i) {
+        avatarList.push(`/img/avatars/${user.avatarList[i]}`);
+      }
+    }
     res.render('partials/user/edit', {
       layout: 'user',
+      lang: req.locale,
       username: user.username,
       email: user.email,
-      avatar: `/img/avatar/${user.avatar}.png`,
+      avatar: `/img/avatars/${user.avatar}`,
+      avatarList: avatarList
     });
   }).catch(opts => {
     global.log.buildResponseFromCode(opts.code, {}, opts.err);
@@ -239,32 +249,115 @@ exports.updatePassword = (req, res) => {
 
 // Submission to update avatar, /api/user/update/avatar
 exports.updateAvatar = (req, res) => {
-  global.log.info(`Request ${req.method} API call on /api/user/update/avatar`);
+  const clickedAvatar = path.basename(req.body.src);
+  UserHelper.get({ id: req.userId }).then(user => {
+    const index = user.avatarList.indexOf(clickedAvatar);
+    // Avatar name is not in user avatar list, immediate return to avoid tentative to remove avatars that are not user's ones
+    if (index === -1) {
+      const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_NOT_FOUND');
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
+    // Get avatar index in list, splice it and re-append it to the end of the array to make it the active one
+    user.avatarList.splice(index, 1);
+    user.avatarList.push(clickedAvatar);
+    user.avatar = clickedAvatar;
+    // Then save user in database
+    UserHelper.save(user).then(() => {
+      const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_SUCCESS', { url: '/profile/edit' }, user.username);
+      res.status(responseObject.status).send(responseObject);
+    }).catch(opts => {
+      const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+      res.status(responseObject.status).send(responseObject);
+    });
+  }).catch(opts => {
+    const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
+  });
+};
+
+
+// Submission to delete an avatar, /api/user/delete/avatar
+exports.deleteAvatar = (req, res) => {
+  const clickedAvatar = path.basename(req.body.src);
+  UserHelper.get({ id: req.userId }).then(user => {
+    const index = user.avatarList.indexOf(clickedAvatar);
+    // Avatar name is not in user avatar list, immediate return to avoid tentative to remove avatars that are not user's ones
+    if (index === -1) {
+      const responseObject = global.log.buildResponseFromCode('B_PROFILE_DELETE_AVATAR_NOT_FOUND');
+      res.status(responseObject.status).send(responseObject);
+      return;
+    }
+    // Clear target avatar from fs
+    fs.unlink(path.join(__dirname, `../../assets/img/avatars/${clickedAvatar}`), removeErr => {
+      if (removeErr) {
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_DELETE_AVATAR_UNLINK_ERROR', {}, removeErr);
+        res.status(responseObject.status).send(responseObject);
+        return;
+      }
+      // Update user avatar list and current avatar
+      user.avatarList.splice(index, 1);
+      user.avatar = user.avatarList[user.avatarList.length - 1];
+      // Re-generate a random identicon for user if no avatar are left
+      if (user.avatarList.length === 0) {
+        const avatarName = `${utils.genAvatarName()}`;
+        new identicon(avatarName);
+        user.avatar = `${avatarName}.png`;
+        user.avatarList.push(`${avatarName}.png`);
+      }
+      // Save user to database
+      UserHelper.save(user).then(() => {
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_DELETE_AVATAR_SUCCESS', { url: '/profile/edit' }, user.username);
+        res.status(responseObject.status).send(responseObject);
+      }).catch(opts => {
+        const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+        res.status(responseObject.status).send(responseObject);
+      });
+    });
+  }).catch(opts => {
+    const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+    res.status(responseObject.status).send(responseObject);
+  });
+};
+
+
+// Submission to update avatar, /api/user/upload/avatar
+exports.uploadAvatar = (req, res) => {
+  global.log.info(`Request ${req.method} API call on /api/user/upload/avatar`);
   global.log.info(`Search a matching user for id ${req.userId}`);
   UserHelper.get({ id: req.userId }).then(user => {
     const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, `../../assets/img/avatar/${user.avatar}.png`);
     const ext = path.extname(req.file.originalname).toLowerCase();
-    const acceptedExt = ['.png', '.jpg', '.gif', '.bmp', '.webp'];
+    const avatarName = `${utils.genAvatarName()}${ext}`;
+    const targetPath = path.join(__dirname, `../../assets/img/avatars/${avatarName}`);
+    const acceptedExt = fileConfig.allowedImgExt;
     if (acceptedExt.indexOf(ext) !== -1) {
-      global.log.info(`Replacing avatar with name ${user.avatar}`);
-      fs.rename(tempPath, targetPath, err => {
-        if (err) {
-          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_RENAME_ERROR', {}, err);
+      fs.rename(tempPath, targetPath, renameErr => {
+        if (renameErr) {
+          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR', {}, renameErr);
           res.status(responseObject.status).send(responseObject);
           return;
         }
-        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_SUCCESS', { url: '/profile/edit' }, user.username);
-        res.status(responseObject.status).send(responseObject);
+        // Update user avatar information with new avatar
+        user.avatar = avatarName;
+        user.avatarList.push(avatarName);
+        UserHelper.save(user).then(() => {
+          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_SUCCESS', { url: '/profile/edit' }, user.username);
+          res.status(responseObject.status).send(responseObject);
+        }).catch(opts => {
+          const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+          res.status(responseObject.status).send(responseObject);
+        });
       });
     } else {
-      fs.unlink(tempPath, err => {
-        if (err) {
-          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_UNLINK_ERROR', {}, err);
+      fs.unlink(tempPath, removeErr => {
+        if (removeErr) {
+          const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_UNLINK_ERROR', {}, removeErr);
           res.status(responseObject.status).send(responseObject);
           return;
         }
-        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPDATE_AVATAR_UNSUPPORTED_FORMAT', {}, err);
+        // Respond client with unsupported format exception
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_UNSUPPORTED_FORMAT');
         res.status(responseObject.status).send(responseObject);
       });
     }

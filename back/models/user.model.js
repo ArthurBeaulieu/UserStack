@@ -6,6 +6,7 @@ const User = mongoose.model('User', new mongoose.Schema({
   username: { type: String, unique: true },
   email: { type: String, unique: true },
   avatar: String,
+  avatarList: [],
   code: String,
   password: String,
   registration: Date,

@@ -52,11 +52,11 @@ class identicon {
     const b64Image = this._canvas.toDataURL();
     const buffer = new Buffer(b64Image.replace(/^data:image\/\w+;base64,/, ''), 'base64');
     // Build assets/img/avatar if not existing
-    if (!fs.existsSync(`${path.join(__dirname, '../../assets/img/avatar/')}`)) {
-      fs.mkdirSync(`${path.join(__dirname, '../../assets/img/avatar/')}`, { recursive: true });
+    if (!fs.existsSync(`${path.join(__dirname, '../../assets/img/avatars/')}`)) {
+      fs.mkdirSync(`${path.join(__dirname, '../../assets/img/avatars/')}`, { recursive: true });
     }
     // Saving image to disk as png
-    fs.writeFileSync(`${path.join(__dirname, '../../assets/img/avatar/')}${fileName}.png`, buffer);
+    fs.writeFileSync(`${path.join(__dirname, '../../assets/img/avatars/')}${fileName}.png`, buffer);
   }
 
 

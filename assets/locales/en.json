@@ -1,9 +1,116 @@
 {
-	"index": "UserStack - Public",
-	"home": "UserStack - Homepage",
-	"user": "UserStack - User",
-	"admin": "UserStack - Administration",
-	"auth": "UserStack - Authentification",
+	"admin": {
+		"headTitle": "Administration",
+		"headDesc": "Administration page for UserStack application",
+		"pageTitle": "UserStack - Administration",
+		"nav": {
+			"home": "Admin",
+			"users": "User list"
+		},
+		"users": {
+			"lockRegistration": "Lock registration",
+			"title": "Registered users",
+			"username": "Username",
+			"email": "Email",
+			"registration": "Registration date",
+			"lastLogin": "Last login",
+			"godfather": "Godfather",
+			"depth": "Depth from admin account",
+			"children": "Invited users",
+			"roles": "Roles",
+			"adminRole": "Administrator",
+			"userRole": "User",
+			"delete": "Delete user"
+		}
+	},
+	"auth": {
+		"headTitle": "Authentication",
+		"headDesc": "Authentication page for UserStack application",
+		"pageTitle": "UserStack - Authentication",
+		"nav": {
+			"login": "Login",
+			"logout": "Logout",
+			"register": "Register"
+		},
+		"activate": {
+			"title": "Account activation",
+			"error": "The activation email couldn't be sent because of an internal server error. Contact server admin",
+			"emailSent": "An email was sent to %s with a confirmation link ; click on it to activate your account",
+			"spamCheck": "Please check your spam if it doesn't appear in your inbox. If however, you've received nothing, refresh this page to send another one"
+		},
+		"login": {
+			"title": "Login",
+			"username": "Username or email",
+			"password": "Password",
+			"submit": "Login"
+		},
+		"register": {
+			"title": "Register",
+			"username": "Username",
+			"email": "Email",
+			"code": "Invitation code",
+			"password": "Password",
+			"confirmPassword": "Confirm password",
+			"submit": "Register"
+		}
+	},
+	"home": {
+		"headTitle": "Private homepage",
+		"headDesc": "Homepage for authenticated users",
+		"pageTitle": "UserStack - Homepage",
+		"nav": {
+			"home": "Homepage"
+		},
+		"index": {
+			"visibility": "This page is public and does not require an authentication to be loaded"
+		}
+	},
+	"index": {
+		"headTitle": "Welcome to UserStack!",
+		"headDesc": "A tool that provides a basic user stack with roles for any kind of web app!",
+		"pageTitle": "UserStack - Public"
+	},
+	"user": {
+		"headTitle": "User",
+		"headDesc": "Profile page for UserStack application",
+		"pageTitle": "UserStack - User",
+		"nav": {
+			"profile": "Profile",
+			"edit": "Edit profile"
+		},
+		"profile": {
+			"title": "User profile summary",
+			"username": "Username",
+			"email": "Email",
+			"code": "Invitation code",
+			"depth": "Depth from admin account",
+			"godfather": "Godfather",
+			"registration": "Registration date",
+			"lastLogin": "Last login date",
+			"roles": "Roles",
+			"adminRole": "Administrator",
+			"userRole": "User"
+		},
+		"edit": {
+			"title": "Edit user profile",
+			"username": "Username",
+			"email": "Email",
+			"currentPassword": "Current password",
+			"newPassword": "New password",
+			"confirmNewPassword": "Confirm new password",
+			"newAvatar": "Select a new avatar",
+			"delete": "Delete account",
+			"submit": "Update"
+		}
+	},
+	"modal": {
+		"deleteUser": {
+			"title": "Supprimer l'utilisateur",
+			"content": "Vous ètes sur le point de supprimer ce compte de la bse de donnée. Cette action est irréversible",
+			"delete": "Supprimer le compte",
+			"close": "Annuler"
+		}
+	},
 	"errors": {
 		"B_LOGIN_INVALID_FIELD": "Data sent to the server does not contain a username and a password",
 		"B_LOGIN_MISSING_FIELD": "One or several fields are empty, please fill them all before submitting your login form",
@@ -35,10 +142,15 @@
 		"B_PROFILE_UPDATE_INFO_MISSING_FIELD": "Missing username or email to update",
 		"B_PROFILE_UPDATE_INFO_NO_CHANGES": "No changes provided to user information",
 		"B_PROFILE_UPDATE_INFO_UPDATED": "Profile info successfully updated",
-		"B_PROFILE_UPDATE_AVATAR_RENAME_ERROR": "Unable to replace existing avatar with the new one",
-		"B_PROFILE_UPDATE_AVATAR_UNLINK_ERROR": "Internal error while unlinking sent image",
-		"B_PROFILE_UPDATE_AVATAR_UNSUPPORTED_FORMAT": "Image sent to update avatar form is not a supported image",
-		"B_PROFILE_UPDATE_AVATAR_SUCCESS": "Successfully updated user's avatar",
+		"B_PROFILE_UPDATE_AVATAR_NOT_FOUND": "User have not the avatar to update",
+		"B_PROFILE_UPDATE_AVATAR_SUCCESS": "Avatar successfully updated",
+		"B_PROFILE_DELETE_AVATAR_NOT_FOUND": "User have not the avatar to delete",
+		"B_PROFILE_DELETE_AVATAR_UNLINK_ERROR": "Unable to delete existing avatar from assets folder",
+		"B_PROFILE_DELETE_AVATAR_SUCCESS": "Avatar successfully deleted from database",
+		"B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR": "Unable to move temporary avatar to the avatar assets folder",
+		"B_PROFILE_UPLOAD_AVATAR_UNLINK_ERROR": "Unable to unlink avatar stored in temporary upload folder",
+		"B_PROFILE_UPLOAD_AVATAR_UNSUPPORTED_FORMAT": "Image sent to update avatar form is not a supported image",
+		"B_PROFILE_UPLOAD_AVATAR_SUCCESS": "New avatar successfully uploaded",
 		"B_USER_DELETE_SUCCESS": "User successfully deleted from database",
 		"B_USER_NOT_FOUND": "Can not find user in database",
 		"B_ROLE_NOT_FOUND": "Can not find role in database",
@@ -46,7 +158,7 @@
 		"B_INVALID_FIELD": "Provided form data is not matching the expected structure",
 		"B_MISSING_FIELD": "One or several field are empty, please fill them all before submitting your form",
 		"B_NEVER_KILL_ROOT": "Deleting the root account is not permitted",
-		"B_ADMIN_SETTING_SET": "Admin setting set for",
+		"B_ADMIN_SETTING_SET": "Admin setting set for %s",
 		"B_INTERNAL_ERROR_USER_FIND": "Database error when trying to find user in Users collection",
 		"B_INTERNAL_ERROR_USER_SAVE": "Database error when trying to save user in Users collection",
 		"B_INTERNAL_ERROR_USER_COUNT": "Database error when trying to count users in Users collection",

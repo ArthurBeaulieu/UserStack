@@ -8,6 +8,7 @@ exports.publicHomepageTemplate = (req, res) => {
     global.log.info('Rendering template for the / page');
     res.render('partials/index/main', {
       layout : 'index',
+      lang: req.locale,
       isLoggedIn: isLoggedIn
     });
   });
@@ -24,6 +25,7 @@ exports.homepageTemplate = (req, res) => {
       global.log.info('Rendering template for the /home page');
       res.render('partials/home/main', {
         layout : 'home',
+        lang: req.locale,
         isAdmin: isAdminUser
       });
     }).catch(opts => {

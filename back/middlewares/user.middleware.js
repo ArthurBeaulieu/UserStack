@@ -7,6 +7,7 @@ uploadAvatar = (req, res, next) => {
   }).single('avatar');
 
   upload(req, res, err => {
+    // TODO handle error
     next();
   });
 };

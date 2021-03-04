@@ -1,7 +1,6 @@
 {{#if this.isLoggedIn}}
-  <a href="/home">Homepage</a>
+  <a href="/home">{{__ "home.nav.home"}}</a>
 {{else}}
-  <a href="/login">Log in</a>
+  <a href="/login">{{__ "auth.nav.login"}}</a>
 {{/if}}
-
-<p>This page is public and does not require an authentification to be loaded</p>
+<p>{{__ "home.index.visibility"}}</p>

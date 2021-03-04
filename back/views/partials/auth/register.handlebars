@@ -1,19 +1,19 @@
-<h2>Register</h2>
+<h2>{{__ "auth.register.title"}}</h2>
 <div>
   <p id="error-output"></p>
 </div>
 <form id="register-form">
-  <label for="username">Username</label>
+  <label for="username">{{__ "auth.register.username"}}</label>
   <input id="username" type="text" name="username">
-  <label for="email">Email</label>
+  <label for="email">{{__ "auth.register.email"}}</label>
   <input id="email" type="text" name="email">
-  <label for="code">Invite code</label>
+  <label for="code">{{__ "auth.register.code"}}</label>
   <input id="code" type="text" name="code">
-  <label for="pass1">Password</label>
+  <label for="pass1">{{__ "auth.register.password"}}</label>
   <input id="pass1" type="password" name="pass1">
-  <label for="pass2">Confirm password</label>
+  <label for="pass2">{{__ "auth.register.confirmPassword"}}</label>
   <input id="pass2" type="password" name="pass2">
-  <input id="register-submit" type="submit" value="Submit">
+  <input id="register-submit" type="submit" value="{{__ "auth.register.submit"}}">
 </form>
-<a href="/login">Login</a>
+<a href="/login">{{__ "auth.nav.login"}}</a>
 {{> 'loader/lineloader'}}

@@ -1,6 +1,13 @@
 import '../scss/User.scss';
 import Kom from './utils/Kom';
+import Events from './utils/Events';
+import ModalFactory from './modal/ModalFactory';
+
+
 const kom = new Kom();
+window.kom = kom;
+const events = new Events();
+window.events = events;
 
 
 const clearErrorClasses = obj => {
@@ -110,8 +117,8 @@ if (editProfilePasswordSubmit) {
 }
 
 
-const editProfileAvatarSubmit = document.querySelector('#edit-profile-avatar-submit');
-if (editProfileAvatarSubmit) {
+const uploadProfileAvatarSubmit = document.querySelector('#upload-profile-avatar-submit');
+if (uploadProfileAvatarSubmit) {
   const dom = {
     avatar: document.querySelector('#avatar'),
     error: document.querySelector('#error-output'),
@@ -128,18 +135,42 @@ if (editProfileAvatarSubmit) {
       if (res.code === 'B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD') {
         dom.avatar.classList.add('error');
       } else if (res.code === 'F_KOM_XHR_ERROR') {
+        // TODO handle error
         console.log('tmp')
       }
     }
   };
 
-  editProfileAvatarSubmit.addEventListener('click', event => {
+  const avatars = document.querySelector('#avatars');
+  for (let i = 0; i < avatars.children.length; ++i) {
+    const parameters = {
+      src: avatars.children[i].children[0].src
+    };
+
+    if (i !== 0) {
+      avatars.children[i].children[0].addEventListener('click', () => {
+        dom.loading.style.opacity = '1';
+        dom.error.innerHTML = '';
+        clearErrorClasses(dom);
+        kom.post('/api/user/update/avatar', parameters).then(processResponse).catch(processResponse);
+      });
+    }
+
+    avatars.children[i].children[1].addEventListener('click', () => {
+      dom.loading.style.opacity = '1';
+      dom.error.innerHTML = '';
+      clearErrorClasses(dom);
+      kom.post('/api/user/delete/avatar', parameters).then(processResponse).catch(processResponse);
+    });
+  }
+
+  uploadProfileAvatarSubmit.addEventListener('click', event => {
     event.preventDefault();
     const formData = new FormData(document.querySelector('#edit-profile-avatar-form'));
     dom.loading.style.opacity = '1';
     dom.error.innerHTML = '';
     clearErrorClasses(dom);
-    kom.xhr('POST', '/api/user/update/avatar', formData).then(processResponse).catch(processResponse);
+    kom.xhr('POST', '/api/user/upload/avatar', formData).then(processResponse).catch(processResponse);
   });
 }
 
@@ -147,7 +178,7 @@ if (editProfileAvatarSubmit) {
 const deleteAccount = document.querySelector('#delete-account');
 if (deleteAccount) {
   const error = document.querySelector('#error-output');
-  // TODO confirm modal maybe ?
+
   const processResponse = res => {
     if (res.status === 200) {
       window.location.href = res.url;
@@ -157,6 +188,11 @@ if (deleteAccount) {
   };
 
   deleteAccount.addEventListener('click', () => {
-    kom.get('/api/user/delete').then(processResponse).catch(processResponse);
+    new ModalFactory('DeleteAccount', {
+      url: '/template/modal/delete/user',
+      cb: () => {
+        kom.get('/api/user/delete').then(processResponse).catch(processResponse);
+      }
+    });
   });
 }

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const i18n = require('i18n');
 const path = require('path');
+const compression = require('compression');
 const handlebars = require('express-handlebars');
 const db = require('./models');
 const dbConfig = require('./config/db.config');
@@ -64,12 +65,17 @@ app.engine('handlebars', handlebars({
 }));
 
 
+// Enable GZIP compression with compression middleware
+app.use(compression({ level: 9 }));
+
+
 // App urls routing
 global.log.info('Reading routes to be used by client');
 require('./routes/app.routes')(app);
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/admin.routes')(app);
+require('./routes/template.routes')(app);
 
 
 // Database connection and app starting

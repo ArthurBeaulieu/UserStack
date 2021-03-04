@@ -94,9 +94,10 @@ const _finalizeRegistration = opts => {
         }
       }
       // Generate and assign avatar to the user
-      const avatarName = utils.genAvatarName();
+      const avatarName = `${utils.genAvatarName()}`;
       new identicon(avatarName);
-      opts.user.avatar = avatarName;
+      opts.user.avatar = `${avatarName}.png`;
+      opts.user.avatarList.push(`${avatarName}.png`);
       // Database save for user and its godfather promised to avoid internal errors
       const promises = [];
       // Update godfather with new children and code
@@ -168,7 +169,11 @@ const _sendActivationToken = opts => {
 // Public template, /login
 exports.loginTemplate = (req, res) => {
   global.log.info('Rendering template for the /login page');
-  res.render('partials/auth/login', { layout: 'auth', allowRegistration: !global.settings.get('lockRegistration') });
+  res.render('partials/auth/login', {
+    layout: 'auth',
+    lang: req.locale,
+    allowRegistration: !global.settings.get('lockRegistration')
+  });
 };
 
 
@@ -220,7 +225,10 @@ exports.loginPost = (req, res) => {
 // Public template, /register
 exports.registerTemplate = (req, res) => {
   global.log.info('Rendering template for the /register page');
-  res.render('partials/auth/register', { layout: 'auth' });
+  res.render('partials/auth/register', {
+    layout: 'auth',
+    lang: req.locale
+  });
 };
 
 
@@ -271,7 +279,12 @@ exports.registerActivateTemplate = (req, res) => {
       user: user
     }).then(() => {
       global.log.info('Rendering template for the /register/activate page');
-      res.render('partials/auth/activate', { layout: 'auth', error: false, email: user.email });
+      res.render('partials/auth/activate', {
+        layout: 'auth',
+        lang: req.locale,
+        error: false,
+        email: user.email
+      });
     }).catch(opts => {
       if (opts.code) {
         global.log.logFromCode(opts.code, opts.err);
@@ -279,12 +292,20 @@ exports.registerActivateTemplate = (req, res) => {
         global.log.error(opts);
       }
       global.log.info('Rendering template for the /register/activate page with restricted content due to internal error');
-      res.render('partials/auth/activate', { layout: 'auth', error: true });
+      res.render('partials/auth/activate', {
+        layout: 'auth',
+        lang: req.locale,
+        error: true
+      });
     });
   }).catch(opts => {
     global.log.logFromCode(opts.code, opts.err);
     global.log.info('Rendering template for the /register/activate page with restricted content due to internal error');
-    res.render('partials/auth/activate', { layout: 'auth', error: true });
+    res.render('partials/auth/activate', {
+      layout: 'auth',
+      lang: req.locale,
+      error: true
+    });
   });
 };
 

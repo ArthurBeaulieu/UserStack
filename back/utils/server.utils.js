@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const i18n = require('i18n');
 const db = require('../models');
 
 
@@ -28,6 +29,11 @@ exports.formatDate = rawDate => {
   const time = `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}`;
   return `${date} - ${time}`;
 };
+
+
+exports.i18nLocal = (req, phrase) => {
+  return i18n.__({ phrase: phrase, locale: req.getLocale() });
+}
 
 
 exports.initSequence = () => {

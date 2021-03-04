@@ -7,4 +7,8 @@ input.error {
 
 img {
   height: 5rem;
+
+  &.active {
+    border: solid green 1px;
+  }
 }

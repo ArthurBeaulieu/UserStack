@@ -1,19 +1,27 @@
-<h2>Profile</h2>
+<h2>{{__ "user.profile.title"}}</h2>
 <div id="profile-page">
   <p id="error-output"></p>
   <img src="{{avatar}}" alt="user-avatar">
-  <p>{{username}}</p>
-  <p>{{email}}</p>
-  <p>{{code}}</p>
-  <p>{{depth}}</p>
-  <p>{{godfather}}</p>
-  <p>{{registration}}</p>
-  <p>{{lastLogin}}</p>
+  <p>{{__ "user.profile.username"}}</p>
+  <p><b>{{username}}</b></p>
+  <p>{{__ "user.profile.email"}}</p>
+  <p><b>{{email}}</b></p>
+  <p>{{__ "user.profile.code"}}</p>
+  <p><b>{{code}}</b></p>
+  <p>{{__ "user.profile.depth"}}</p>
+  <p><b>{{depth}}</b></p>
+  <p>{{__ "user.profile.godfather"}}</p>
+  <p><b>{{godfather}}</b></p>
+  <p>{{__ "user.profile.registration"}}</p>
+  <p><b>{{registration}}</b></p>
+  <p>{{__ "user.profile.lastLogin"}}</p>
+  <p><b>{{lastLogin}}</b></p>
+  <p>{{__ "user.profile.roles"}}</p>
   <ul class="roles">
     {{#each roles}}
-      <li>{{this}}</li>
+      <li><b>{{this}}</b></li>
     {{/each}}
   </ul>
-  <a href="/profile/edit">Edit profile</a>
-  <a href="/home">Homepage</a>
+  <a href="/profile/edit">{{__ "user.nav.edit"}}</a>
+  <a href="/home">{{__ "home.nav.home"}}</a>
 </div>
