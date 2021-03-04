@@ -1,4 +1,5 @@
 const path = require('path');
+const i18n = require('i18n');
 const handlebars = require('express-handlebars').create();
 
 
@@ -10,13 +11,12 @@ const _getPath = (dir, file) => {
 // Private template (for authenticated users), /template/modal/delete/user
 exports.deleteUserModal = (req, res) => {
   global.log.info('Request template for the /template/modal/delete/user page as string');
-  handlebars.renderView(_getPath('partials/modal', 'userdelete'), {
-    layout: _getPath('layouts', 'modal')
-  }).then(htmlString => {
+
+  handlebars.render(_getPath('partials/modal', 'userdelete'), i18n, {}).then(htmlString => {
     global.log.info('Rendering template for the /template/modal/delete/user page as string');
     res.status(200).send(htmlString);
-    console.log(htmlString)
   }).catch(err => {
-    console.log(err);
+    // TODO handle err
+    console.error(err);
   });
 };
