@@ -174,6 +174,11 @@
     "status": 200,
     "log": "Avatar successfully deleted from database"
   },
+  "B_PROFILE_UPLOAD_AVATAR_SIZE_ERROR": {
+    "type": "warn",
+    "status": 400,
+    "log": "Uploaded image exceed the maximum pixel number for height/width"
+  },
   "B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR": {
     "type": "warn",
     "status": 400,

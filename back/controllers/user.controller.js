@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const sizeOf = require('image-size');
 const authConfig = require('../config/auth.config');
 const fileConfig = require('../config/file.config');
 const UserHelper = require('../helpers/user.helper');
@@ -333,6 +334,14 @@ exports.uploadAvatar = (req, res) => {
     const targetPath = path.join(__dirname, `../../assets/img/avatars/${avatarName}`);
     const acceptedExt = fileConfig.allowedImgExt;
     if (acceptedExt.indexOf(ext) !== -1) {
+      // Dimension check
+      const dimensions = sizeOf(tempPath)
+      if (dimensions.height > fileConfig.maxImgSize || dimensions.width > fileConfig.maxImgSize) {
+        const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_SIZE_ERROR', {}, fileConfig.maxImgSize);
+        res.status(responseObject.status).send(responseObject);
+        return;
+      }
+      // Save temp file to avatars folder
       fs.rename(tempPath, targetPath, renameErr => {
         if (renameErr) {
           const responseObject = global.log.buildResponseFromCode('B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR', {}, renameErr);

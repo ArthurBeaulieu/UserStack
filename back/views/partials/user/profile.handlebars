@@ -13,7 +13,7 @@
   </div>
   <div class="info-wrapper">
     <p>{{__ "user.profile.username"}} : <b>{{username}}</b></p>
-    <p>{{__ "user.profile.email"}} : <b>{{email}}</b> {{#if isVerified}}<img src="/img/auth/verified.svg" class="verified-account">{{/if}}</p>
+    <p>{{__ "user.profile.email"}} : <a href="mailto:{{email}}"><b>{{email}}{{#if isVerified}}<img src="/img/auth/verified.svg" class="verified-account">{{/if}}</b></a></p>
     <p>{{__ "user.profile.code"}} : <b>{{code}}</b></p>
     <p>{{__ "user.profile.depth"}} : <b>{{depth}}</b></p>
     <p>{{__ "user.profile.godfather"}} : <b>{{godfather}}</b></p>

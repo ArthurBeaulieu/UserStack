@@ -4,7 +4,8 @@
   display: flex;
   height: 100vh;
   justify-content: center;
-  position: absolute;
+  position: fixed;
+  top: 0;
   width: 100vw;
 
   .modal {
@@ -33,7 +34,7 @@
     }
 
     .modal-content {
-
+      // Specific rules to write here
     }
 
     .modal-foot {

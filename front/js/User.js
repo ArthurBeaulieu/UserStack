@@ -128,6 +128,7 @@ if (uploadProfileAvatarSubmit) {
   const processResponse = res => {
     dom.loading.style.opacity = '0';
     dom.error.innerHTML = res.message;
+
     if (res.status === 200) {
       window.location.href = res.url;
     } else {
@@ -135,8 +136,9 @@ if (uploadProfileAvatarSubmit) {
       if (res.code === 'B_PROFILE_UPDATE_PASSWORD_INVALID_FIELD') {
         dom.avatar.classList.add('error');
       } else if (res.code === 'F_KOM_XHR_ERROR') {
-        // TODO handle error
-        console.log('tmp')
+        dom.error.innerHTML = 'Error sending avatar to the server';
+      } else if (res.code === 'B_PROFILE_UPLOAD_AVATAR_SIZE_ERROR') {
+        dom.avatar.classList.add('error');
       }
     }
   };

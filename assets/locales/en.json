@@ -66,7 +66,10 @@
 	"index": {
 		"headTitle": "Welcome to UserStack!",
 		"headDesc": "A tool that provides a basic user stack with roles for any kind of web app!",
-		"pageTitle": "UserStack - Public"
+		"pageTitle": "UserStack - Public",
+		"nav": {
+			"home": "Public site"
+		}
 	},
 	"user": {
 		"headTitle": "User",
@@ -141,6 +144,7 @@
 		"B_PROFILE_DELETE_AVATAR_NOT_FOUND": "User have not the avatar to delete",
 		"B_PROFILE_DELETE_AVATAR_UNLINK_ERROR": "Unable to delete existing avatar from assets folder",
 		"B_PROFILE_DELETE_AVATAR_SUCCESS": "Avatar successfully deleted from database",
+		"B_PROFILE_UPLOAD_AVATAR_SIZE_ERROR": "Uploaded image can't exceed %s pixels for height/width",
 		"B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR": "Unable to move temporary avatar to the avatar assets folder",
 		"B_PROFILE_UPLOAD_AVATAR_UNLINK_ERROR": "Unable to unlink avatar stored in temporary upload folder",
 		"B_PROFILE_UPLOAD_AVATAR_UNSUPPORTED_FORMAT": "Image sent to update avatar form is not a supported image",

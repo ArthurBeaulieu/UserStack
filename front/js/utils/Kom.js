@@ -147,7 +147,7 @@ class Kom {
         }
       };
       xhr.onerror = () => {
-        reject('F_KOM_XHR_ERROR');
+        reject({ code: 'F_KOM_XHR_ERROR' });
       };
       xhr.send(data);
     });
@@ -333,11 +333,7 @@ class Kom {
       xhr.open(verb, url, true);
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            resolve(JSON.parse(xhr.responseText));
-          } else {
-            resolve(JSON.parse(xhr.statusText));
-          }
+          resolve(JSON.parse(xhr.responseText));
         }
       };
       // XHR error handling

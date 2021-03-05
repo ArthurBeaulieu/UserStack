@@ -66,7 +66,10 @@
 	"index": {
 		"headTitle": "Bienvenu sur UserStack!",
 		"headDesc": "Un outil pour fournir un système de base d'authentification pour des applications web!",
-		"pageTitle": "UserStack - Page d'accueil publique"
+		"pageTitle": "UserStack - Page d'accueil publique",
+		"nav": {
+			"home": "Page publique"
+		}
 	},
 	"user": {
 		"headTitle": "Profil",
@@ -141,6 +144,7 @@
 		"B_PROFILE_DELETE_AVATAR_NOT_FOUND": "L'utilisateur ne possède pas l'avatar à supprimer",
 		"B_PROFILE_DELETE_AVATAR_UNLINK_ERROR": "Impossible de supprimer l'avatar du serveur",
 		"B_PROFILE_DELETE_AVATAR_SUCCESS": "L'avatar à été supprimé avec succès",
+		"B_PROFILE_UPLOAD_AVATAR_SIZE_ERROR": "L'image ne peux pas dépasser %s pixels de hauteur/largeur",
 		"B_PROFILE_UPLOAD_AVATAR_RENAME_ERROR": "Erreur pendant l'écriture de l'avatar sur le serveur",
 		"B_PROFILE_UPLOAD_AVATAR_UNLINK_ERROR": "Erreur pendant la sauvegarde de l'avatar sur le serveur",
 		"B_PROFILE_UPLOAD_AVATAR_UNSUPPORTED_FORMAT": "Le format de l'image envoyé n'est pas supporté",
