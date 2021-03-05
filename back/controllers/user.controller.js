@@ -73,6 +73,7 @@ exports.profileTemplate = (req, res) => {
           godfather: godfather.username,
           registration: utils.formatDate(user.registration),
           lastLogin: utils.formatDate(user.lastlogin),
+          isVerified: user.active,
           roles: roles
         });
       }).catch(opts => {

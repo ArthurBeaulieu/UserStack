@@ -1,7 +1,15 @@
 import '../scss/Admin.scss';
 import Kom from './utils/Kom';
-const kom = new Kom();
+import Events from "./utils/Events";
+import ModalFactory from "./modal/ModalFactory";
 
+
+const kom = new Kom();
+window.kom = kom;
+const events = new Events();
+window.events = events;
+
+// TODO add loader
 const lockRegistration = document.querySelector('#lock-registration');
 const usersList = document.querySelector('#users-list');
 if (lockRegistration && usersList) {
@@ -30,6 +38,7 @@ if (lockRegistration && usersList) {
     }
 
     const deleteButton = usersList.children[i].querySelector('.delete-user');
+
     deleteButton.addEventListener('click', () => {
       const processResponse = res => {
         if (res.status === 200) {
@@ -39,11 +48,15 @@ if (lockRegistration && usersList) {
         }
       };
 
-      const parameters = {
-        userId: usersList.children[i].dataset.id
-      };
-
-      kom.post('/api/user/delete', parameters).then(processResponse).catch(processResponse);
+      new ModalFactory('DeleteAccount', {
+        url: '/template/modal/delete/user',
+        cb: () => {
+          const parameters = {
+            userId: usersList.children[i].dataset.id
+          };
+          kom.post('/api/user/delete', parameters).then(processResponse).catch(processResponse);
+        }
+      });
     });
   }
 

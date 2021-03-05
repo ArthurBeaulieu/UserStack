@@ -2,6 +2,8 @@
   --color-red: rgb(233, 33, 33);
 
   --color-bg: rgb(200, 200, 200);
+  --color-bg-darker: rgb(166, 166, 166);
+  --color-bg-overlay: rgba(33, 33, 33, .3);
   --color-border: rgb(133, 133, 133);
   --color-border-selected: rgb(166, 166, 166);
 
@@ -25,11 +27,12 @@ body {
   font-size: 1.2rem;
 }
 
-input {
+input,
+button {
   background: transparent;
   border: solid 1px var(--color-border);
   border-radius: var(--radius);
-  padding: .5rem;
+  padding: .5rem 1rem;
   text-align: center;
 
   transition: border var(--transition) ease-in, background-color var(--transition) ease-out;
@@ -49,8 +52,21 @@ input {
     width: min-content;
   }
 
+  &[type="checkbox"] {
+    vertical-align: bottom;
+  }
+
   &.error {
     border-color: var(--color-red);
+  }
+}
+
+button {
+  cursor: pointer;
+
+  &.danger {
+    background-color: var(--color-red);
+    font-weight: bold;
   }
 }
 
@@ -68,5 +84,58 @@ input {
 
   p {
     font-style: italic;
+  }
+}
+
+.page-navigation {
+  align-items: center;
+  display: flex;
+  left: 2rem;
+  position: absolute;
+  text-decoration: none;
+  top: 2rem;
+
+  img {
+    height: 2rem;
+    padding-right: 1rem;
+  }
+}
+
+.menu-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  .menu-item {
+    align-items: center;
+    border: solid 3px var(--color-border);
+    border-radius: var(--radius);
+    box-sizing: content-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem;
+    padding: 2rem 3rem;
+    width: 10rem;
+
+    transition: background-color var(--transition) ease-in;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: var(--color-bg);
+    }
+
+    img {
+      height: 3rem;
+      margin-bottom: 1rem;
+      width: 3rem;
+    }
+  }
+
+  a {
+    font-weight: bold;
+    text-decoration: none;
   }
 }

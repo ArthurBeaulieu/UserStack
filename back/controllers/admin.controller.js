@@ -39,6 +39,7 @@ exports.adminUsersTemplate = (req, res) => {
             avatar: `/img/avatars/${users[i].avatar}`,
             registration: utils.formatDate(users[i].registration),
             lastLogin: utils.formatDate(users[i].lastlogin),
+            isVerified: users[i].active,
             godfather: null,
             depth: users[i].depth,
             children: [],

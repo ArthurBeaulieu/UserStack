@@ -9,7 +9,6 @@
 		},
 		"users": {
 			"lockRegistration": "Lock registration",
-			"title": "Registered users",
 			"username": "Username",
 			"email": "Email",
 			"registration": "Registration date",
@@ -17,7 +16,6 @@
 			"godfather": "Godfather",
 			"depth": "Depth from admin account",
 			"children": "Invited users",
-			"roles": "Roles",
 			"adminRole": "Administrator",
 			"userRole": "User",
 			"delete": "Delete user"
@@ -89,7 +87,6 @@
 			"userRole": "User"
 		},
 		"edit": {
-			"title": "Edit user profile",
 			"username": "Username",
 			"email": "Email",
 			"currentPassword": "Current password",
@@ -102,10 +99,10 @@
 	},
 	"modal": {
 		"deleteUser": {
-			"title": "Supprimer l'utilisateur",
-			"content": "Vous ètes sur le point de supprimer ce compte de la bse de donnée. Cette action est irréversible",
-			"delete": "Supprimer le compte",
-			"close": "Annuler"
+			"title": "Delete user",
+			"content": "You are about to remove this account from database. Warning, this is a one way action that will revoke your access to this app",
+			"delete": "Delete account",
+			"close": "Close"
 		}
 	},
 	"errors": {
