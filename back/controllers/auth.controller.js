@@ -141,7 +141,8 @@ const _sendActivationToken = opts => {
     // Create confirm token that will be sent to email
     const userToken = AuthTokenHelper.new({
       userId: opts.user.id,
-      token: utils.genAuthToken()
+      token: utils.genAuthToken(),
+      createdAt: new Date()
     });
     // Now gen the activation token and send it by mail to the user
     AuthTokenHelper.save(userToken).then(() => {

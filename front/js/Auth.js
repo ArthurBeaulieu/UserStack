@@ -3,9 +3,6 @@ import Kom from './utils/Kom';
 const kom = new Kom();
 
 
-const mailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-
-
 const clearErrorClasses = obj => {
   const keys = Object.keys(obj);
   for (let i = 0; i < keys.length; ++i) {
@@ -24,25 +21,6 @@ if (registerSubmit) {
     pass2: document.querySelector('#pass2'),
     error: document.querySelector('#error-output'),
     loading: document.querySelector('#line-loader')
-  };
-  // Method to check that fields are properly filled
-  const validateFields = data => {
-    // This validation only concerns frontend side. Same tests and other ones are performed server side
-    if (data.username && data.username.length < 1) {
-      dom.error.innerHTML = 'Username must at least contain one character.';
-      dom.username.classList.add('error');
-      return false;
-    } else if (data.email && !mailRegex.test(data.email)) {
-      dom.error.innerHTML = 'Provided email is invalid';
-      dom.email.classList.add('error');
-      return false;
-    } else if (data.pass1 !== data.pass2) {
-      dom.error.innerHTML = 'The two provided passwords are not matching.';
-      dom.pass1.classList.add('error');
-      dom.pass2.classList.add('error');
-      return false;
-    }
-    return true;
   };
   // Method to react to the server response for a given form
   const processResponse = res => {
@@ -98,13 +76,11 @@ if (registerSubmit) {
     // Remove previous error classes and feedback
     dom.error.innerHTML = '';
     clearErrorClasses(dom);
-    // Only call server is front tests are ok. Same tests are performed server side
-    if (validateFields(parameters)) {
-      dom.loading.style.opacity = '1';
-      kom.post('/api/auth/register', parameters).then(processResponse).catch(processResponse);
-    }
+    dom.loading.style.opacity = '1';
+    kom.post('/api/auth/register', parameters).then(processResponse).catch(processResponse);
   });
 }
+
 
 const loginSubmit = document.querySelector('#login-submit');
 if (loginSubmit) {
