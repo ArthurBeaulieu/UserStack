@@ -165,6 +165,8 @@
 		"B_INTERNAL_ERROR_ROLE_SAVE": "Database error when trying to save role in Roles collection",
 		"B_INTERNAL_ERROR_AUTH_TOKEN_FIND": "Database error when trying to find auth token in AuthToken collection",
 		"B_INTERNAL_ERROR_AUTH_TOKEN_SAVE": "Database error when trying to save auth token in AuthToken collection",
-		"B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": "Database error when trying to delete auth token in AuthToken collection"
+		"B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": "Database error when trying to delete auth token in AuthToken collection",
+		"B_INTERNAL_ERROR_FILE_UPLOAD": "An error occured when trying to save uploaded file to the server",
+		"B_INTERNAL_ERROR_TEMPLATE_RENDERING": "An error occurred when rendering the template as a string"
 	}
 }

@@ -1,3 +1,7 @@
 import '../scss/Home.scss';
 
-console.log('Home')
+const socket = io();
+
+socket.on('news', msg => {
+  console.log(msg)
+});

@@ -165,6 +165,8 @@
 		"B_INTERNAL_ERROR_ROLE_SAVE": "Erreur de la base de donnée en essayant de sauvegarder le rôle dans la collection",
 		"B_INTERNAL_ERROR_AUTH_TOKEN_FIND": "Erreur de la base de donnée en essayant de trouver le jeton d'authentification dans la collection",
 		"B_INTERNAL_ERROR_AUTH_TOKEN_SAVE": "Erreur de la base de donnée en essayant de sauvegarder le jeton d'authentification de la collection",
-		"B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": "Erreur de la base de donnée en essayant de supprimer le jeton d'authentification de la collection"
+		"B_INTERNAL_ERROR_AUTH_TOKEN_DELETE": "Erreur de la base de donnée en essayant de supprimer le jeton d'authentification de la collection",
+		"B_INTERNAL_ERROR_FILE_UPLOAD": "Une erreur est survenue lors du téléversement du fichier vers le serveur",
+		"B_INTERNAL_ERROR_TEMPLATE_RENDERING": "Une erreur est survenue lors du rendu du modèle en tant que chaîne e caractères"
 	}
 }

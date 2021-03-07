@@ -78,6 +78,12 @@ require('./routes/admin.routes')(app);
 require('./routes/template.routes')(app);
 
 
+// Sockets communication
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+require('./sockets/app.socket')(io);
+
+
 // Database connection and app starting
 global.log.info('Connecting server to the database');
 db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.NAME}`, {
@@ -91,8 +97,8 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.NAME
   global.log.info('Connection to MongoDB successful');
   // Perform initial sequence to check for proper collection
   utils.initSequence().then(() => {
-    // Start listening for events on port 3000
-    app.listen(3000, () => {
+    // Start listening for events on port 3000, on server instead of app to make socket work
+    server.listen(3000, () => {
       global.log.info('UserStack server is ready to operate!');
     });
     // Add listener on kill process to properly log before exit

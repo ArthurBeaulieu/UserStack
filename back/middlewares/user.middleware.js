@@ -2,13 +2,19 @@ const multer = require('multer');
 
 
 uploadAvatar = (req, res, next) => {
+  global.log.info('Request an avatar upload to the uploads/tmp folder');
   const upload = multer({
     dest: './assets/img/uploads/tmp'
   }).single('avatar');
-
-  upload(req, res, err => {
-    // TODO handle error
-    next();
+  // Try to upload image to the server
+  upload(req, res, uploadErr => {
+    if (uploadErr) {
+      const responseObject = global.log.buildResponseFromCode('B_INTERNAL_ERROR_FILE_UPLOAD', {}, uploadErr);
+      res.status(responseObject.status).send(responseObject);
+    } else {
+      global.log.info('Image successfully uploaded in uploads/tmp folder, continue route execution');
+      next();
+    }
   });
 };
 

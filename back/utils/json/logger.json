@@ -283,5 +283,15 @@
     "type": "error",
     "status": 500,
     "log": "Database error when trying to delete auth token in AuthToken collection"
+  },
+  "B_INTERNAL_ERROR_FILE_UPLOAD": {
+    "type": "error",
+    "status": 500,
+    "log": "An error occurred when uploading file to the tmp folder"
+  },
+  "B_INTERNAL_ERROR_TEMPLATE_RENDERING": {
+    "type": "error",
+    "status": 500,
+    "log": "An error occurred when rendering the template as a string"
   }
 }

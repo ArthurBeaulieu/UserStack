@@ -9,11 +9,14 @@ window.kom = kom;
 const events = new Events();
 window.events = events;
 
-// TODO add loader
+
 const lockRegistration = document.querySelector('#lock-registration');
 const usersList = document.querySelector('#users-list');
 if (lockRegistration && usersList) {
-  const error = document.querySelector('#error-output');
+  const dom = {
+    error: document.querySelector('#error-output'),
+    loading: document.querySelector('#line-loader')
+  }
 
   for (let i = 0; i < usersList.children.length; ++i) {
     const roles = usersList.children[i].querySelector('.user-roles');
@@ -22,6 +25,8 @@ if (lockRegistration && usersList) {
       const revokeRoleInput = roles.children[j].lastElementChild;
       revokeRoleInput.addEventListener('change', () => {
         const processResponse = res => {
+          dom.loading.style.opacity = '0';
+
           if (res.status === 200) {
             window.location = '/admin/users';
           }
@@ -33,6 +38,7 @@ if (lockRegistration && usersList) {
           userId: usersList.children[i].dataset.id
         };
 
+        dom.loading.style.opacity = '1';
         kom.post('/api/user/update/role', parameters).then(processResponse).catch(processResponse);
       });
     }
@@ -41,10 +47,12 @@ if (lockRegistration && usersList) {
 
     deleteButton.addEventListener('click', () => {
       const processResponse = res => {
+        dom.loading.style.opacity = '0';
+
         if (res.status === 200) {
           window.location = '/admin/users';
         } else if (res.code === 'B_NEVER_KILL_ROOT') {
-          error.innerHTML = res.message;
+          dom.error.innerHTML = res.message;
         }
       };
 
@@ -54,6 +62,8 @@ if (lockRegistration && usersList) {
           const parameters = {
             userId: usersList.children[i].dataset.id
           };
+
+          dom.loading.style.opacity = '1';
           kom.post('/api/user/delete', parameters).then(processResponse).catch(processResponse);
         }
       });
@@ -62,16 +72,20 @@ if (lockRegistration && usersList) {
 
   lockRegistration.addEventListener('change', () => {
     const processResponse = res => {
+      dom.loading.style.opacity = '0';
+
       if (res.status === 200) {
         window.location = '/admin/users';
       } else if (res.code === 'B_NEVER_KILL_ROOT') {
-        error.innerHTML = res.message;
+        dom.error.innerHTML = res.message;
       }
     };
 
     const parameters = {
       lockRegistration: lockRegistration.checked
     };
+
+    dom.loading.style.opacity = '1';
     kom.post('/api/admin/update/settings', parameters).then(processResponse).catch(processResponse);
   });
 }
