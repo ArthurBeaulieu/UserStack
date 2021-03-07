@@ -165,7 +165,8 @@ exports.updateInviteCodes = () => {
   return new Promise((resolve, reject) => {
     User.find({}, (findErr, users) => {
       if (findErr) {
-        reject(findErr)
+        const err = new Error(findErr);
+        reject({ code: 'B_INTERNAL_ERROR_USER_FIND', err: err.toString() });
       } else {
         const promises = [];
 
@@ -179,7 +180,10 @@ exports.updateInviteCodes = () => {
           promises.push(users[i].save());
         }
 
-        Promise.all(promises).then(resolve).catch(reject);
+        Promise.all(promises).then(resolve).catch(saveErr => {
+          const err = new Error(saveErr);
+          reject({ code: 'B_INTERNAL_ERROR_USER_SAVE', err: err.toString() })
+        });
       }
     });
   });

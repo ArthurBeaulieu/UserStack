@@ -96,12 +96,15 @@ exports.updateSetting = (req, res) => {
     const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'lock registration');
     res.status(responseObject.status).send(responseObject);
   } else if (form.hasOwnProperty('maxDepth')) {
+    const oldDepth = global.settings.get('maxDepth');
     global.settings.set('maxDepth', parseInt(form.maxDepth));
     UserHelper.updateInviteCodes().then(() => {
       const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'max depth');
       res.status(responseObject.status).send(responseObject);
-    }).catch(err => {
-
+    }).catch(opts => {
+      global.settings.set('maxDepth', oldDepth);
+      const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
+      res.status(responseObject.status).send(responseObject);
     });
   }
 };
