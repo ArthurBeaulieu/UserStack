@@ -3,8 +3,14 @@
   <p>{{__ "admin.nav.home"}}</p>
 </a>
 <div class="register-settings">
-  <label for="lock-registration">{{__ "admin.users.lockRegistration"}}</label>
-  <input id="lock-registration" type="checkbox" {{#if locked}}checked{{/if}}/>
+  <div>
+    <label for="lock-registration">{{__ "admin.users.lockRegistration"}}</label>
+    <input id="lock-registration" type="checkbox" {{#if locked}}checked{{/if}}/>
+  </div>
+  <div>
+    <label for="max-depth">{{__ "admin.users.maxDepth"}}</label>
+    <input id="max-depth" type="number" min="0" max="10" value="{{depth}}"/>
+  </div>
 </div>
 <ul id="users-list" class="admin-user-list">
   {{#each users}}

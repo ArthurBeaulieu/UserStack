@@ -80,7 +80,8 @@ exports.adminUsersTemplate = (req, res) => {
     res.render('partials/admin/users', {
       layout : 'admin',
       users: usersFormatted,
-      locked: global.settings.get('lockRegistration')
+      locked: global.settings.get('lockRegistration'),
+      depth: global.settings.get('maxDepth'),
     });
   });
 };
@@ -94,5 +95,13 @@ exports.updateSetting = (req, res) => {
     global.settings.set('lockRegistration', form.lockRegistration);
     const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'lock registration');
     res.status(responseObject.status).send(responseObject);
+  } else if (form.hasOwnProperty('maxDepth')) {
+    global.settings.set('maxDepth', parseInt(form.maxDepth));
+    UserHelper.updateInviteCodes().then(() => {
+      const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'max depth');
+      res.status(responseObject.status).send(responseObject);
+    }).catch(err => {
+
+    });
   }
 };

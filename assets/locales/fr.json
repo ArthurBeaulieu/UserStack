@@ -9,6 +9,7 @@
 		},
 		"users": {
 			"lockRegistration": "Bloquer les inscriptions",
+			"maxDepth": "Profondeur maximale",
 			"username": "Nom d'utilisateur",
 			"email": "Adresse mail",
 			"registration": "Date d'inscription",

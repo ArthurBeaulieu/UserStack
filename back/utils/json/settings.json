@@ -1,3 +1,4 @@
 {
-  "lockRegistration": true
+  "lockRegistration": false,
+  "maxDepth": 1
 }

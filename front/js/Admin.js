@@ -11,12 +11,13 @@ window.events = events;
 
 
 const lockRegistration = document.querySelector('#lock-registration');
+const maxDepth = document.querySelector('#max-depth');
 const usersList = document.querySelector('#users-list');
-if (lockRegistration && usersList) {
+if (lockRegistration && maxDepth && usersList) {
   const dom = {
     error: document.querySelector('#error-output'),
     loading: document.querySelector('#line-loader')
-  }
+  };
 
   for (let i = 0; i < usersList.children.length; ++i) {
     const roles = usersList.children[i].querySelector('.user-roles');
@@ -76,13 +77,28 @@ if (lockRegistration && usersList) {
 
       if (res.status === 200) {
         window.location = '/admin/users';
-      } else if (res.code === 'B_NEVER_KILL_ROOT') {
-        dom.error.innerHTML = res.message;
       }
     };
 
     const parameters = {
       lockRegistration: lockRegistration.checked
+    };
+
+    dom.loading.style.opacity = '1';
+    kom.post('/api/admin/update/settings', parameters).then(processResponse).catch(processResponse);
+  });
+
+  maxDepth.addEventListener('click', () => {
+    const processResponse = res => {
+      dom.loading.style.opacity = '0';
+
+      if (res.status === 200) {
+        window.location = '/admin/users';
+      }
+    };
+
+    const parameters = {
+      maxDepth: maxDepth.value
     };
 
     dom.loading.style.opacity = '1';

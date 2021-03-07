@@ -67,7 +67,7 @@ const _finalizeRegistration = opts => {
         godfather.children.push(opts.user._id);
         opts.user.depth = godfather.depth + 1;
         opts.user.parent = godfather._id;
-        if (opts.user.depth >= authConfig.maxDepth) {
+        if (opts.user.depth >= global.settings.get('maxDepth')) {
           global.log.info('New user has reached max depth from root account, revoking its code to invite new user');
           opts.user.code = ''; // Remove invite code if max depth is reached
         }

@@ -9,6 +9,7 @@
 		},
 		"users": {
 			"lockRegistration": "Lock registration",
+			"maxDepth": "Max depth allowed",
 			"username": "Username",
 			"email": "Email",
 			"registration": "Registration date",

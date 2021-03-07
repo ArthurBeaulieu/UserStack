@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../models');
+const utils = require('../utils/server.utils');
 const authConfig = require('../config/auth.config.js');
 
 
@@ -155,6 +156,31 @@ exports.isAdminUser = user => {
       }
       // Resolve as not admin by default
       resolve(false);
+    });
+  });
+};
+
+
+exports.updateInviteCodes = () => {
+  return new Promise((resolve, reject) => {
+    User.find({}, (findErr, users) => {
+      if (findErr) {
+        reject(findErr)
+      } else {
+        const promises = [];
+
+        for (let i = 0; i < users.length; ++i) {
+          if (users[i].depth >= global.settings.get('maxDepth')) {
+            users[i].code = '';
+          } else if (users[i].code === '' && users[i].depth < global.settings.get('maxDepth')) {
+            users[i].code = utils.genInviteCode();
+          }
+
+          promises.push(users[i].save());
+        }
+
+        Promise.all(promises).then(resolve).catch(reject);
+      }
     });
   });
 };

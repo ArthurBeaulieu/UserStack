@@ -16,8 +16,16 @@ body {
 .register-settings {
   font-weight: bold;
 
+  div {
+    margin-top: 1rem;
+  }
+
   input {
     margin-left: 1rem;
+
+    &[type="number"] {
+      width: 6rem;
+    }
   }
 }
 

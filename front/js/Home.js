@@ -1,3 +1,4 @@
+import io from './lib/socket.io.min';
 import '../scss/Home.scss';
 
 const socket = io();

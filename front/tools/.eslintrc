@@ -13,5 +13,6 @@
     "no-console": "off",
     "strict": ["error", "global"],
     "curly": "warn"
-  }
+  },
+  "ignorePatterns": ["socket.io.min.js"]
 }
