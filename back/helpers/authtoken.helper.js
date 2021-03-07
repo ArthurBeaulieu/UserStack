@@ -7,7 +7,8 @@ const AuthToken = db.authtoken;
 exports.new = opts => {
   return new AuthToken({
     _userId: opts.userId,
-    token: opts.token
+    token: opts.token,
+    createdAt: opts.createdAt
   });
 };
 
