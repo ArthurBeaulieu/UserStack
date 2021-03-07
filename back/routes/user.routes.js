@@ -5,7 +5,6 @@ const controller = require('../controllers/user.controller');
 module.exports = app => {
   app.get('/profile', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.profileTemplate);
   app.get('/profile/edit', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.profileEditTemplate);
-
   app.get('/api/user/delete', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.delete); // User want to remove its account
   app.post('/api/user/delete', [authMiddleware.isLoggedIn, authMiddleware.isActivated, authMiddleware.isAdmin], controller.delete); // Admin remove user account
   app.post('/api/user/update/info', [authMiddleware.isLoggedIn, authMiddleware.isActivated], controller.updateInfo);

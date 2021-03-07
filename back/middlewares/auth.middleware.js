@@ -40,7 +40,7 @@ isActivated = (req, res, next) => {
 };
 
 
-// Check token validity from request's cookies to allow access
+// Middleware to check token validity from request's cookies to allow access
 isLoggedIn = (req, res, next) => {
   global.log.info(`Request a token validation for url ${req.originalUrl}`);
   // Extract token from session cookies
@@ -65,7 +65,7 @@ isLoggedIn = (req, res, next) => {
 };
 
 
-// Check database to grant or not access if user has admin role
+// Middleware to check database to grant or not access if user has admin role
 isAdmin = (req, res, next) => {
   global.log.info(`Request an admin check on user for url ${req.originalUrl}`);
   UserHelper.get({ id: req.userId }).then(user => {
@@ -90,6 +90,7 @@ isAdmin = (req, res, next) => {
 };
 
 
+// Middleware to check if the lockRegistration setting is set
 isRegistrationAllowed = (req, res, next) => {
   if (global.settings.get('lockRegistration')) {
     global.log.info('Registration are not allowed, redirecting to /');

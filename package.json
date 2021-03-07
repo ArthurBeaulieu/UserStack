@@ -1,6 +1,6 @@
 {
   "name": "user-stack",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "UserStack",
   "keywords": [],
   "main": "back/UserStackServer.js",

@@ -5,6 +5,9 @@ const text = require('./json/logger.json'); // Server console logging messages i
 const utils = require('./server.utils');
 
 
+/* Backend logger class to properly handle both the logging files and the response to send to the client */
+
+
 class logger {
 
 

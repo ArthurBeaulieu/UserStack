@@ -52,7 +52,6 @@ const _connectChildrenToGodfather = (godfather, children) => {
 // Private /profile template (for authenticated users), /profile
 exports.profileTemplate = (req, res) => {
   global.log.info('Request template for the /profile page');
-  global.log.info(`Search a matching user for id ${req.userId}`);
   UserHelper.get({ id: req.userId }).then(user => {
     global.log.info(`Matching user ${user.username} to display the profile`);
     UserHelper.get({ id: user.parent || '', empty: true }).then(godfather => {
@@ -102,13 +101,13 @@ exports.profileEditTemplate = (req, res) => {
   global.log.info('Request template for the /profile/edit page');
   // Find matching user for token ID
   UserHelper.get({ id: req.userId }).then(user => {
-    global.log.info('Rendering template for the /profile/edit page');
     const avatarList = [];
     if (user.avatarList.length > 1) {
       for (let i = user.avatarList.length - 2; i >= 0; --i) {
         avatarList.push(`/img/avatars/${user.avatarList[i]}`);
       }
     }
+    global.log.info('Rendering template for the /profile/edit page');
     res.render('partials/user/edit', {
       layout: 'user',
       lang: req.locale,
@@ -378,7 +377,7 @@ exports.uploadAvatar = (req, res) => {
 };
 
 
-// Submission from user delete button or admin delete user button, /api/user/update/delete
+// Submission from user delete button or admin delete user button, /api/user/delete
 exports.delete = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/user/delete`);
   let id = req.userId;

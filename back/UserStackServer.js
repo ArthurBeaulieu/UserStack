@@ -14,6 +14,9 @@ const logger = require('./utils/logger');
 const utils = require('./utils/server.utils');
 
 
+const version = '1.0.0';
+
+
 // Create logger instance and attach it to the global object to make it available app-wide
 global.log = new logger({
   debug: true
@@ -25,7 +28,7 @@ global.settings = new settings();
 
 
 // Express configuration for server
-global.log.info('Starting UserStack server...');
+global.log.info(`Starting UserStack server v${version}`);
 const app = express();
 app.use(express.static('assets'));
 app.use(cors({ origin: 'http://localhost:3001' }));
@@ -66,7 +69,7 @@ app.engine('handlebars', handlebars({
 
 
 // Enable GZIP compression with compression middleware
-app.use(compression({ level: 9 }));
+app.use(compression());
 
 
 // App urls routing

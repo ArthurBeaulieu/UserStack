@@ -3,6 +3,7 @@ const i18n = require('i18n');
 const handlebars = require('express-handlebars').create();
 
 
+// Internal shortcut to build partials path for file
 const _getPath = (dir, file) => {
   return path.join(__dirname, `../views/${dir}/${file}.handlebars`);
 };

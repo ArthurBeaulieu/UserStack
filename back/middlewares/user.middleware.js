@@ -1,6 +1,7 @@
 const multer = require('multer');
 
 
+// Multer middleware to upload image and save it in the /assets/img/uploads/tmp folder before treating it
 uploadAvatar = (req, res, next) => {
   global.log.info('Request an avatar upload to the uploads/tmp folder');
   const upload = multer({

@@ -4,6 +4,10 @@ const db = require('../models');
 const Role = db.role;
 
 
+/* This helper provides a promised way to use mongoose and properly handle errors */
+
+
+// Role getter, by id, by name, or with custom filter, to return one or many roles
 exports.get = opts => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
@@ -41,7 +45,7 @@ exports.get = opts => {
 };
 
 
-
+// Role getter to retrieve all saved roles in database
 exports.getAll = () => {
   return new Promise((resolve, reject) => {
     Role.find({}, (findErr, roles) => {

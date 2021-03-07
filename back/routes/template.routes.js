@@ -1,4 +1,4 @@
-const { authMiddleware, userMiddleware } = require('../middlewares');
+const { authMiddleware } = require('../middlewares');
 const controller = require('../controllers/template.controller');
 
 

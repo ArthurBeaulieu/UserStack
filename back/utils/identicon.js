@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('path');
 
 
+/* Utils class to generate identicon */
+
+
 class identicon {
 
 

@@ -8,6 +8,10 @@ const User = db.user;
 const Role = db.role;
 
 
+/* This helper provides a promised way to use mongoose and properly handle errors */
+
+
+// Returns a new User with specific internals
 exports.new = opts => {
   return new User({
     username: opts.username,
@@ -19,6 +23,7 @@ exports.new = opts => {
 };
 
 
+// User getter, by id, by name, or with custom filter, to return one or many users
 exports.get = opts => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
@@ -65,6 +70,7 @@ exports.get = opts => {
 };
 
 
+// User getter to retrieve all saved users in database
 exports.getAll = () => {
   return new Promise((resolve, reject) => {
     User.find({}, (findErr, users) => {
@@ -78,6 +84,7 @@ exports.getAll = () => {
 };
 
 
+// Helper to count all users saved in database
 exports.count = () => {
   return new Promise((resolve, reject) => {
     User.countDocuments({}, (userCountErr, count) => {
@@ -91,6 +98,7 @@ exports.count = () => {
 };
 
 
+// Save the user into the database
 exports.save = user => {
   return new Promise((resolve, reject) => {
     user.save(userSaveErr => {
@@ -104,6 +112,7 @@ exports.save = user => {
 };
 
 
+// User deletion helper, warning, it won't update the user's genealogy to link deleted user children to its parent
 exports.delete = filter => {
   return new Promise((resolve, reject) => {
     User.deleteOne(filter,  userDeleteErr => {
@@ -117,6 +126,7 @@ exports.delete = filter => {
 };
 
 
+// Helper to check the user jwt token, warning, do not use this as a middleware, as it is not intended to work as it
 exports.isLoggedIn = req => {
   return new Promise(resolve => {
     // Extract token from session cookies
@@ -136,6 +146,7 @@ exports.isLoggedIn = req => {
 };
 
 
+// Helper to check if user's role contains admin, warning, do not use this as a middleware, as it is not intended to work as it
 exports.isAdminUser = user => {
   return new Promise((resolve, reject) => {
     if (!user || !user.roles) {
@@ -161,6 +172,8 @@ exports.isAdminUser = user => {
 };
 
 
+// Iterate over all users to update their inviste code, depending on the maxDepth setting.
+// If user is at max reach, clear its invite code, otherwise, generate one
 exports.updateInviteCodes = () => {
   return new Promise((resolve, reject) => {
     User.find({}, (findErr, users) => {

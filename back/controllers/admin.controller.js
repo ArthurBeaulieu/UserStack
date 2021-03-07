@@ -19,6 +19,7 @@ exports.adminUsersTemplate = (req, res) => {
   // Internal variables for template
   const promises = [];
   const usersFormatted = [];
+  // Need to perform user formatting before sending to client
   promises.push(new Promise(resolve => {
     UserHelper.getAll().then(users => {
       RoleHelper.getAll().then(roles => {
@@ -92,16 +93,19 @@ exports.updateSetting = (req, res) => {
   global.log.info(`Request ${req.method} API call on /api/admin/update/settings`);
   const form = req.body;
   if (form.hasOwnProperty('lockRegistration')) {
+    global.log.info(`Set setting lockRegistration to ${form.lockRegistration}`);
     global.settings.set('lockRegistration', form.lockRegistration);
     const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'lock registration');
     res.status(responseObject.status).send(responseObject);
   } else if (form.hasOwnProperty('maxDepth')) {
+    global.log.info(`Set setting maxDepth to ${form.maxDepth}`);
     const oldDepth = global.settings.get('maxDepth');
     global.settings.set('maxDepth', parseInt(form.maxDepth));
     UserHelper.updateInviteCodes().then(() => {
       const responseObject = global.log.buildResponseFromCode('B_ADMIN_SETTING_SET', {}, 'max depth');
       res.status(responseObject.status).send(responseObject);
     }).catch(opts => {
+      global.log.info(`Failed to set setting maxDepth, restoring it to ${oldDepth}`);
       global.settings.set('maxDepth', oldDepth);
       const responseObject = global.log.buildResponseFromCode(opts.code, {}, opts.err);
       res.status(responseObject.status).send(responseObject);

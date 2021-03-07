@@ -18,7 +18,6 @@ exports.publicHomepageTemplate = (req, res) => {
 // Private template (for authenticated users), /home
 exports.homepageTemplate = (req, res) => {
   global.log.info('Request template for the /home page');
-  global.log.info(`Search a matching user for id ${req.userId}`);
   UserHelper.get({ id: req.userId }).then(user => {
     global.log.info(`Matching user ${user.username} to display the homepage`);
     UserHelper.isAdminUser(user).then(isAdminUser => {

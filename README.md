@@ -1,6 +1,6 @@
 # UserStack
 
-![](https://badgen.net/badge/version/0.1.2/blue)
+![](https://badgen.net/badge/version/1.0.0/blue)
 [![License](https://img.shields.io/github/license/ArthurBeaulieu/UserStack.svg)](https://github.com/ArthurBeaulieu/UserStack/blob/master/LICENSE.md)
 
 This template provides a basic user system built with Node.js, Express Js and MongoDB.
@@ -18,7 +18,6 @@ config = {
   secret: 'userstack-secret-key', // Secret key used to hash things (token etc)
   adminCode: 'GGJESUS', // The invitation code to provide for the first user to register
   passwordLength: 8, // The minimal password length expected
-  maxDepth: 2, // The maximum depth of users from first account
   tokenValidity: 86400, // Tokens validity in seconds
   saltRounds: 8 // The amount of salt rounds to use when hashing passwords
 }
@@ -26,15 +25,19 @@ config = {
 
 Since registration are restrained using an invitation code, users are linked to each other like a user genealogy. The root account is at depth 0, while all the user it will invite using its code will be at depth 1 etc. The maximum depth restrain the registration process ; users that have reached this maximum depth will not have any invitation code.
 
+Administrator accounts can lock or unlock registration, and update the allowed depth in the adminuistration page.
+
 Users are assigned with roles : admin and user. The admin role grant access for the admin page, while the user role grant access to all the private pages except the administration ones.
 
 # Get started
 
 To make it work on your environment, please rename `.env.example` to `.env` and fill all the required information in it.
 
-You must first ensure you've created a MongoDB user that match the content you'll fill in the `.env` file. You must also ensure that the MongoDB service is running before starting the server.
+You must ensure `npm` is installed on the system, and that you've run `npm install` before going any further. You can optionnaly build front end assets, using `npm run build` or `npm run watch`.
 
-In order to allow registration with confirmation link sent to new users by email, you must fill a smtp provider, and an associated account in this `.env` file as well.
+If you have `docker` and `docker-compose` installed on your system, you can run `docker-compose up -d` after you've created an `.env` file to automatically run a MongoDB container for this app.
+
+However, if you can't use `docker`, you must manually install MongoDB, and ensure you've created a database that match the information you've filled in the `.env` file. You also may create a user with permissions on this database if you filled those in the `.env` file. Finally, you must also ensure that the MongoDB service is running before starting the server.
 
 # Available routes
 
@@ -45,7 +48,7 @@ In order to allow registration with confirmation link sent to new users by email
 - `/verify/:email/:token` link sent by mail used to verify an account
 
 ### Private route for users with user role :
-- `/register/activate` is the page that send an activation link by email
+- `/register/activate` is the page that sends an activation link by email
 - `/home` is the private homepage for registered users
 - `/profile` is the page that summarizes the user information
 - `/profile/edit` is the page for users to change their information and password
@@ -97,6 +100,26 @@ payload = {
 }
 ```
 
+### `/api/user/update/avatar` `POST`
+```javascript
+// The avatarSrc is an already saved one for user, but which was not its active avatar
+payload = {
+  src: avatarSrc  
+}
+```
+
+### `/api/user/delete/avatar` `POST`
+```javascript
+payload = {
+  src: avatarSrc  
+}
+```
+
+### `/api/user/upload/avatar` `POST`
+```javascript
+// Payload is a FormData created from an input[type="file"] 
+```
+
 ### `/api/user/delete` `GET`
 The user wants to remove its account
 
@@ -115,5 +138,13 @@ payload = {
   userId: userId, // The user Id to modify roles from
   roleId: roleId, // The role ID to assign/revoke
   checked: true // Grant or not role to user
+}
+```
+
+### `/api/admin/update/settings` `POST`
+```javascript
+payload = {
+  lockRegistration: Boolean, // Allow or not registration on app
+  maxDepth: Number // Update max depth from root account for new users
 }
 ```

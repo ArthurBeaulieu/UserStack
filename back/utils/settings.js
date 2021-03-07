@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 
+/* Class to make global server settings available, and to save them into associated JSON */
+
+
 class settings {
 
 

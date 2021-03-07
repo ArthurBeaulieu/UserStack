@@ -346,7 +346,7 @@ exports.verify = (req, res) => {
 };
 
 
-// Logout redirection url -> clear cookies and redirect to public homepage, /logout
+// Logout redirection url, /logout
 exports.logout = (req, res) => {
   global.log.info('Request /logout action');
   res.clearCookie('jwtToken');

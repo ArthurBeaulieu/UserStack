@@ -6,23 +6,27 @@ const db = require('../models');
 const Role = db.role;
 
 
+// Generates a user AuthToken
 exports.genAuthToken = () => {
   return crypto.randomBytes(40).toString('hex').toUpperCase();
 };
 
 
+// Generates a user invite code
 exports.genInviteCode = () => {
   return crypto.randomBytes(20).toString('hex').toUpperCase();
 };
 
 
+// Generates an avatar name. Warning, this could lead to collision
 exports.genAvatarName = () => {
   return crypto.randomBytes(10).toString('hex').toLowerCase();
 };
 
 
+// Format a date stored in database to a more digest form
 exports.formatDate = rawDate => {
-  // Format dat according to parameter, if no date were provided, simply use now date instead
+  // Format date according to parameter, if no date were provided, simply use now date instead
   let d = (rawDate ? new Date(rawDate) : new Date());
   // Convert Js date into readable string with format YYYY/MM/DD - HH:MM
   const date = `${d.getFullYear()}/${('0' + (d.getMonth() + 1)).slice(-2)}/${('0' + d.getDate()).slice(-2)}`;
@@ -31,11 +35,14 @@ exports.formatDate = rawDate => {
 };
 
 
+// Convert a given phrase according to the request locale
 exports.i18nLocal = (req, phrase) => {
   return i18n.__({ phrase: phrase, locale: req.getLocale() });
 }
 
 
+// Server initialisation sequence that runs everytime the server is launched
+// On first launch, it will populate the role collection
 exports.initSequence = () => {
   return new Promise((resolve, reject) => {
     global.log.info('UserStack init sequence to control the database state');

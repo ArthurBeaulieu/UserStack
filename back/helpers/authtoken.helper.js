@@ -4,6 +4,10 @@ const db = require('../models');
 const AuthToken = db.authtoken;
 
 
+/* This helper provides a promised way to use mongoose and properly handle errors */
+
+
+// New AuthToken creation helper
 exports.new = opts => {
   return new AuthToken({
     _userId: opts.userId,
@@ -13,6 +17,7 @@ exports.new = opts => {
 };
 
 
+// AuthToken getter, only to be used with the token value
 exports.get = token => {
   return new Promise((resolve, reject) => {
     // Enclosed method to perform standard failure test upon model response
@@ -36,6 +41,7 @@ exports.get = token => {
 };
 
 
+// AuthToken save helper
 exports.save = authToken => {
   return new Promise((resolve, reject) => {
     authToken.save(authTokenSaveErr => {
@@ -49,6 +55,7 @@ exports.save = authToken => {
 };
 
 
+// AuthToken manual deletion helper
 exports.delete = filter => {
   return new Promise((resolve, reject) => {
     AuthToken.deleteOne(filter,  authTokenDeleteErr => {

@@ -1,6 +1,9 @@
 const authConfig = require('../config/auth.config');
 
 
+/* This helper will perform standard test on form data to avoid the wrong arguments to be sent to database */
+
+
 // Form data coming from /api/auth/login
 exports.login = form => {
   // Prevent wrong arguments sent to POST

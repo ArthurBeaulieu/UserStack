@@ -1,3 +1,6 @@
+/* This helper is made to format mail as HTML */
+
+
 exports.activationLinkMail = opts => {
   return `
     <h3>Welcome to ${process.env.APP_NAME}, ${opts.user.username}!</h3>

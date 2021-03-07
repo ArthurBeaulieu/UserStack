@@ -1,5 +1,5 @@
 <a href="/profile" class="page-navigation">
-  <img src="/img/nav/previous.svg">
+  <img src="/img/nav/previous.svg" alt="profile-page">
   <p>{{__ "user.nav.profile"}}</p>
 </a>
 <div class="edit-profile-wrapper">
@@ -7,13 +7,13 @@
     <div id="avatars" class="avatar-list">
       <div class="avatar-wrapper">
         <img src="{{avatar}}" class="active avatar" alt="current-user-avatar">
-        <img src="/img/action/delete.svg" class="delete-avatar">
-        <img src="/img/auth/verified.svg" class="active-avatar">
+        <img src="/img/action/delete.svg" class="delete-avatar" alt="delete-avatar">
+        <img src="/img/auth/verified.svg" class="active-avatar" alt="active-avatar">
       </div>
       {{#each avatarList}}
         <div class="avatar-wrapper">
           <img src="{{this}}" class="avatar" alt="old-user-avatar">
-          <img src="/img/action/delete.svg" class="delete-avatar">
+          <img src="/img/action/delete.svg" class="delete-avatar" alt="delete-avatar">
         </div>
       {{/each}}
     </div>

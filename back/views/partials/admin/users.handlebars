@@ -1,5 +1,5 @@
 <a href="/admin" class="page-navigation">
-  <img src="/img/nav/previous.svg">
+  <img src="/img/nav/previous.svg" alt="admin-page">
   <p>{{__ "admin.nav.home"}}</p>
 </a>
 <div class="register-settings">
@@ -29,7 +29,7 @@
       </div>
       <div class="user-wrapper">
         <p>{{../__ "admin.users.username"}} : <b>{{username}}</b></p>
-        <p>{{../__ "admin.users.email"}} : <a href="mailto:{{this.email}}"><b>{{this.email}}{{#if this.isVerified}}<img src="/img/auth/verified.svg" class="verified-account">{{/if}}</b></a></p>
+        <p>{{../__ "admin.users.email"}} : <a href="mailto:{{this.email}}"><b>{{this.email}}{{#if this.isVerified}}<img src="/img/auth/verified.svg" class="verified-account" alt="verified-account">{{/if}}</b></a></p>
         <p>{{../__ "admin.users.registration"}} : <b>{{this.registration}}</b></p>
         <p>{{../__ "admin.users.lastLogin"}} : <b>{{this.lastLogin}}</b></p>
         <p>{{../__ "admin.users.godfather"}} : <b>{{this.godfather}}</b></p>
